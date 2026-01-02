@@ -4,7 +4,7 @@ import 'local_auth_service.dart';
 class LocalLoginPage extends StatefulWidget {
   final LocalAuthService authService;
 
-  const LocalLoginPage({Key? key, required this.authService}) : super(key: key);
+  const LocalLoginPage({super.key, required this.authService});
 
   @override
   State<LocalLoginPage> createState() => _LocalLoginPageState();

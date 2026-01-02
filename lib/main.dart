@@ -559,8 +559,20 @@ class _FridgeHomeState extends State<FridgeHome> {
                                               Center(
                                                 child: Text(
                                                   _getIcon(item.name),
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 40,
+                                                    fontFamily: Theme.of(
+                                                                        context)
+                                                                    .platform ==
+                                                                TargetPlatform
+                                                                    .iOS ||
+                                                            Theme.of(context)
+                                                                    .platform ==
+                                                                TargetPlatform
+                                                                    .macOS
+                                                        ? 'Apple Color Emoji'
+                                                        : null,
+                                                    inherit: false,
                                                   ),
                                                 ),
                                               ),
@@ -653,14 +665,20 @@ class _FridgeHomeState extends State<FridgeHome> {
                                               Center(
                                                 child: Text(
                                                   _getIcon(item.name),
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 40,
-                                                    fontFamily: '',
-                                                    fontFamilyFallback: [
-                                                      'Apple Color Emoji',
-                                                      'Noto Color Emoji',
-                                                      'Segoe UI Emoji'
-                                                    ],
+                                                    fontFamily: Theme.of(
+                                                                        context)
+                                                                    .platform ==
+                                                                TargetPlatform
+                                                                    .iOS ||
+                                                            Theme.of(context)
+                                                                    .platform ==
+                                                                TargetPlatform
+                                                                    .macOS
+                                                        ? 'Apple Color Emoji'
+                                                        : null,
+                                                    inherit: false,
                                                   ),
                                                 ),
                                               ),
