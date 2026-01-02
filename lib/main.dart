@@ -201,6 +201,40 @@ class _FridgeHomeState extends State<FridgeHome> {
     _dataService.removeFridgeItem(itemId);
   }
 
+  IconData _getFoodIcon(String name) {
+    // 根据名称返回对应的Material Icon
+    if (name.contains('苹果') || name.contains('果')) return Icons.apple;
+    if (name.contains('肉') ||
+        name.contains('牛') ||
+        name.contains('猪') ||
+        name.contains('羊')) return Icons.food_bank;
+    if (name.contains('蛋')) return Icons.egg;
+    if (name.contains('菜') ||
+        name.contains('蔬') ||
+        name.contains('萝卜') ||
+        name.contains('黄瓜') ||
+        name.contains('西兰花') ||
+        name.contains('菠菜')) return Icons.grass;
+    if (name.contains('鱼') ||
+        name.contains('虾') ||
+        name.contains('蟹') ||
+        name.contains('海鲜')) return Icons.set_meal;
+    if (name.contains('面包') || name.contains('饼')) return Icons.bakery_dining;
+    if (name.contains('奶') || name.contains('牛奶')) return Icons.water_drop;
+    if (name.contains('冰') || name.contains('雪糕') || name.contains('冰激凌'))
+      return Icons.icecream;
+    if (name.contains('咖啡')) return Icons.coffee;
+    if (name.contains('茶')) return Icons.emoji_food_beverage;
+    if (name.contains('酒') || name.contains('啤')) return Icons.liquor;
+    if (name.contains('水') || name.contains('饮料')) return Icons.local_drink;
+    if (name.contains('糖') || name.contains('巧克力') || name.contains('甜'))
+      return Icons.cake;
+    if (name.contains('米') || name.contains('饭')) return Icons.rice_bowl;
+
+    // 默认图标
+    return Icons.restaurant;
+  }
+
   String _getIcon(String name) {
     // 根据名称返回对应的emoji图标，使用模糊匹配
     final Map<String, String> iconMap = {
@@ -557,19 +591,11 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: RichText(
-                                                  text: TextSpan(
-                                                    text: _getIcon(item.name),
-                                                    style: const TextStyle(
-                                                      fontSize: 40,
-                                                      color: Colors.black,
-                                                      fontFamilyFallback: [
-                                                        'Noto Color Emoji',
-                                                        'Apple Color Emoji',
-                                                        'Segoe UI Emoji'
-                                                      ],
-                                                    ),
-                                                  ),
+                                                child: Icon(
+                                                  _getFoodIcon(item.name),
+                                                  size: 40,
+                                                  color:
+                                                      const Color(0xFF2D5016),
                                                 ),
                                               ),
                                               Positioned(
@@ -659,19 +685,11 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: RichText(
-                                                  text: TextSpan(
-                                                    text: _getIcon(item.name),
-                                                    style: const TextStyle(
-                                                      fontSize: 40,
-                                                      color: Colors.black,
-                                                      fontFamilyFallback: [
-                                                        'Noto Color Emoji',
-                                                        'Apple Color Emoji',
-                                                        'Segoe UI Emoji'
-                                                      ],
-                                                    ),
-                                                  ),
+                                                child: Icon(
+                                                  _getFoodIcon(item.name),
+                                                  size: 40,
+                                                  color:
+                                                      const Color(0xFF2D5016),
                                                 ),
                                               ),
                                               Positioned(
