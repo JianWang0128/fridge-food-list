@@ -1,5 +1,5 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class FridgeItem {
   final String id;
@@ -40,50 +40,31 @@ class FridgeItem {
 }
 
 class LocalFridgeDataService {
-  Database? _database;
   final String userId;
+  late SharedPreferences _prefs;
+  bool _initialized = false;
 
   LocalFridgeDataService(this.userId);
 
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
+  Future<void> _ensureInitialized() async {
+    if (!_initialized) {
+      _prefs = await SharedPreferences.getInstance();
+      _initialized = true;
+    }
   }
 
-  Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'fridge_app.db');
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) {
-        return db.execute(
-          '''
-          CREATE TABLE IF NOT EXISTS fridge_items(
-            id TEXT PRIMARY KEY,
-            userId TEXT NOT NULL,
-            name TEXT NOT NULL,
-            type TEXT NOT NULL,
-            quantity TEXT NOT NULL,
-            createdAt TEXT NOT NULL
-          )
-          ''',
-        );
-      },
-    );
-  }
+  String _getKey() => 'fridge_items_$userId';
 
   Future<List<FridgeItem>> _getFridgeItemsAsync() async {
-    final db = await database;
-    final maps = await db.query(
-      'fridge_items',
-      where: 'userId = ?',
-      whereArgs: [userId],
-      orderBy: 'createdAt DESC',
-    );
-    return List.generate(maps.length, (i) => FridgeItem.fromMap(maps[i]));
+    await _ensureInitialized();
+    final jsonString = _prefs.getString(_getKey()) ?? '[]';
+    final List<dynamic> jsonList = jsonDecode(jsonString);
+    final items = jsonList
+        .map((item) => FridgeItem.fromMap(item as Map<String, dynamic>))
+        .toList();
+    // Sort by createdAt descending
+    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return items;
   }
 
   Stream<List<FridgeItem>> getFridgeItems() async* {
@@ -94,14 +75,7 @@ class LocalFridgeDataService {
   }
 
   Future<List<FridgeItem>> getFridgeItemsOnce() async {
-    final db = await database;
-    final maps = await db.query(
-      'fridge_items',
-      where: 'userId = ?',
-      whereArgs: [userId],
-      orderBy: 'createdAt DESC',
-    );
-    return List.generate(maps.length, (i) => FridgeItem.fromMap(maps[i]));
+    return await _getFridgeItemsAsync();
   }
 
   Future<void> addFridgeItem(
@@ -109,7 +83,7 @@ class LocalFridgeDataService {
     String type = 'refrigerated',
     String quantity = '1',
   }) async {
-    final db = await database;
+    await _ensureInitialized();
     final itemId = DateTime.now().millisecondsSinceEpoch.toString();
     final item = FridgeItem(
       id: itemId,
@@ -119,27 +93,24 @@ class LocalFridgeDataService {
       createdAt: DateTime.now(),
     );
 
-    final map = item.toMap();
-    map['userId'] = userId;
+    final items = await _getFridgeItemsAsync();
+    items.add(item);
 
-    await db.insert('fridge_items', map);
+    final jsonList = items.map((item) => item.toMap()).toList();
+    await _prefs.setString(_getKey(), jsonEncode(jsonList));
   }
 
   Future<void> removeFridgeItem(String itemId) async {
-    final db = await database;
-    await db.delete(
-      'fridge_items',
-      where: 'id = ? AND userId = ?',
-      whereArgs: [itemId, userId],
-    );
+    await _ensureInitialized();
+    final items = await _getFridgeItemsAsync();
+    items.removeWhere((item) => item.id == itemId);
+
+    final jsonList = items.map((item) => item.toMap()).toList();
+    await _prefs.setString(_getKey(), jsonEncode(jsonList));
   }
 
   Future<void> clearAllItems() async {
-    final db = await database;
-    await db.delete(
-      'fridge_items',
-      where: 'userId = ?',
-      whereArgs: [userId],
-    );
+    await _ensureInitialized();
+    await _prefs.remove(_getKey());
   }
 }
