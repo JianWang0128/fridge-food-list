@@ -11,7 +11,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 初始化Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // 等待一小段时间确保Firebase完全初始化
+  await Future.delayed(const Duration(milliseconds: 500));
 
   runApp(
     MultiProvider(
