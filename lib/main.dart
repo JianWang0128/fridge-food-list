@@ -559,20 +559,9 @@ class _FridgeHomeState extends State<FridgeHome> {
                                               Center(
                                                 child: Text(
                                                   _getIcon(item.name),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 40,
-                                                    fontFamily: Theme.of(
-                                                                        context)
-                                                                    .platform ==
-                                                                TargetPlatform
-                                                                    .iOS ||
-                                                            Theme.of(context)
-                                                                    .platform ==
-                                                                TargetPlatform
-                                                                    .macOS
-                                                        ? 'Apple Color Emoji'
-                                                        : null,
-                                                    inherit: false,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ),
@@ -665,20 +654,9 @@ class _FridgeHomeState extends State<FridgeHome> {
                                               Center(
                                                 child: Text(
                                                   _getIcon(item.name),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 40,
-                                                    fontFamily: Theme.of(
-                                                                        context)
-                                                                    .platform ==
-                                                                TargetPlatform
-                                                                    .iOS ||
-                                                            Theme.of(context)
-                                                                    .platform ==
-                                                                TargetPlatform
-                                                                    .macOS
-                                                        ? 'Apple Color Emoji'
-                                                        : null,
-                                                    inherit: false,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
                                               ),
