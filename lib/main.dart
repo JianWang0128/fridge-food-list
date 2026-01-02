@@ -598,19 +598,17 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Image.network(
-                                                  _getEmojiUrl(
-                                                      _getIcon(item.name)),
-                                                  width: 40,
-                                                  height: 40,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Text(
-                                                      _getIcon(item.name),
-                                                      style: const TextStyle(
-                                                          fontSize: 40),
-                                                    );
-                                                  },
+                                                child: Text(
+                                                  _getIcon(item.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 40,
+                                                    fontFamily:
+                                                        'Apple Color Emoji',
+                                                    fontFamilyFallback: [
+                                                      'Segoe UI Emoji',
+                                                      'Noto Color Emoji'
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                               Positioned(
@@ -700,19 +698,17 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Image.network(
-                                                  _getEmojiUrl(
-                                                      _getIcon(item.name)),
-                                                  width: 40,
-                                                  height: 40,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Text(
-                                                      _getIcon(item.name),
-                                                      style: const TextStyle(
-                                                          fontSize: 40),
-                                                    );
-                                                  },
+                                                child: Text(
+                                                  _getIcon(item.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 40,
+                                                    fontFamily:
+                                                        'Apple Color Emoji',
+                                                    fontFamilyFallback: [
+                                                      'Segoe UI Emoji',
+                                                      'Noto Color Emoji'
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                               Positioned(
