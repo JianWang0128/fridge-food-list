@@ -30,47 +30,47 @@ class DefaultFirebaseOptions {
 
   // TODO: 替换为你的Firebase项目配置
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'your-api-key',
-    appId: 'your-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
-    authDomain: 'your-project-id.firebaseapp.com',
-    storageBucket: 'your-project-id.appspot.com',
-    measurementId: 'your-measurement-id',
+    apiKey: 'AIzaSyCSSST-Zw2C8D7tywZL_W9BcoR-fy-OTpA',
+    appId: '1:954407963626:web:868304497d36ce19bd8093',
+    messagingSenderId: '954407963626',
+    projectId: 'fridge-food-list',
+    authDomain: 'fridge-food-list.firebaseapp.com',
+    storageBucket: 'fridge-food-list.firebasestorage.app',
+    measurementId: 'G-N2P9LMEY0W',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'your-api-key',
-    appId: 'your-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
+    apiKey: 'AIzaSyCSSST-Zw2C8D7tywZL_W9BcoR-fy-OTpA',
+    appId: '1:954407963626:web:868304497d36ce19bd8093',
+    messagingSenderId: '954407963626',
+    projectId: 'fridge-food-list',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'your-api-key',
-    appId: 'your-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
+    apiKey: 'AIzaSyCSSST-Zw2C8D7tywZL_W9BcoR-fy-OTpA',
+    appId: '1:954407963626:web:868304497d36ce19bd8093',
+    messagingSenderId: '954407963626',
+    projectId: 'fridge-food-list',
   );
 
   static const FirebaseOptions macOS = FirebaseOptions(
-    apiKey: 'your-api-key',
-    appId: 'your-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
+    apiKey: 'AIzaSyCSSST-Zw2C8D7tywZL_W9BcoR-fy-OTpA',
+    appId: '1:954407963626:web:868304497d36ce19bd8093',
+    messagingSenderId: '954407963626',
+    projectId: 'fridge-food-list',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'your-api-key',
-    appId: 'your-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
+    apiKey: 'AIzaSyCSSST-Zw2C8D7tywZL_W9BcoR-fy-OTpA',
+    appId: '1:954407963626:web:868304497d36ce19bd8093',
+    messagingSenderId: '954407963626',
+    projectId: 'fridge-food-list',
   );
 
   static const FirebaseOptions linux = FirebaseOptions(
-    apiKey: 'your-api-key',
-    appId: 'your-app-id',
-    messagingSenderId: 'your-sender-id',
-    projectId: 'your-project-id',
+    apiKey: 'AIzaSyCSSST-Zw2C8D7tywZL_W9BcoR-fy-OTpA',
+    appId: '1:954407963626:web:868304497d36ce19bd8093',
+    messagingSenderId: '954407963626',
+    projectId: 'fridge-food-list',
   );
 }
