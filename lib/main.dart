@@ -15,11 +15,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase initialized successfully');
 
     // 等待一小段时间确保Firebase完全初始化
     await Future.delayed(const Duration(milliseconds: 500));
-    print('Firebase delay completed');
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
@@ -54,18 +52,12 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
-    print('AuthWrapper build called');
 
     return StreamBuilder<User?>(
       stream: authService.authStateChanges,
       builder: (context, snapshot) {
-        print(
-          'StreamBuilder state: ${snapshot.connectionState}, hasData: ${snapshot.hasData}, hasError: ${snapshot.hasError}, error: ${snapshot.error}',
-        );
-
         // 处理错误状态
         if (snapshot.hasError) {
-          print('Firebase error: ${snapshot.error}');
           return Scaffold(
             body: Center(
               child: Column(
@@ -91,18 +83,15 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          print('Showing loading indicator');
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
         if (snapshot.hasData) {
-          print('User is authenticated, showing FridgeHome');
           return const FridgeHome();
         }
 
-        print('User not authenticated, showing LoginPage');
         return LoginPage(authService: authService);
       },
     );
