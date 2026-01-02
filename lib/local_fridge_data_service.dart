@@ -75,7 +75,7 @@ class LocalFridgeDataService {
     );
   }
 
-  Future<List<FridgeItem>> getFridgeItems() async {
+  Future<List<FridgeItem>> _getFridgeItemsAsync() async {
     final db = await database;
     final maps = await db.query(
       'fridge_items',
@@ -86,9 +86,28 @@ class LocalFridgeDataService {
     return List.generate(maps.length, (i) => FridgeItem.fromMap(maps[i]));
   }
 
-  Stream<List<FridgeItem>> getFridgeItemsStream() async* {
+  Stream<List<FridgeItem>> getFridgeItems() async* {
     while (true) {
-      yield await getFridgeItems();
+      yield await _getFridgeItemsAsync();
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+  }
+
+  Future<List<FridgeItem>> getFridgeItemsOnce() async {
+    final db = await database;
+    final maps = await db.query(
+      'fridge_items',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'createdAt DESC',
+    );
+    return List.generate(maps.length, (i) => FridgeItem.fromMap(maps[i]));
+  }
+
+  @Deprecated('Use getFridgeItems() instead')
+  Future<List<FridgeItem>> getFridgeItemsStream() async* {
+    while (true) {
+      yield await _getFridgeItemsAsync();
       await Future.delayed(const Duration(milliseconds: 500));
     }
   }
