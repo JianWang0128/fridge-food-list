@@ -155,7 +155,7 @@ class AuthWrapper extends StatelessWidget {
 class FridgeHome extends StatefulWidget {
   final String username;
 
-  const FridgeHome({Key? key, required this.username}) : super(key: key);
+  const FridgeHome({super.key, required this.username});
 
   @override
   State<FridgeHome> createState() => _FridgeHomeState();
@@ -655,6 +655,12 @@ class _FridgeHomeState extends State<FridgeHome> {
                                                   _getIcon(item.name),
                                                   style: const TextStyle(
                                                     fontSize: 40,
+                                                    fontFamily: '',
+                                                    fontFamilyFallback: [
+                                                      'Apple Color Emoji',
+                                                      'Noto Color Emoji',
+                                                      'Segoe UI Emoji'
+                                                    ],
                                                   ),
                                                 ),
                                               ),
