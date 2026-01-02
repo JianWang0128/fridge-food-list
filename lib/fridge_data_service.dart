@@ -4,18 +4,34 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FridgeItem {
   final String id;
   final String name;
+  final String type; // 'frozen' 或 'refrigerated'
+  final String quantity; // 数量
   final DateTime createdAt;
 
-  FridgeItem({required this.id, required this.name, required this.createdAt});
+  FridgeItem({
+    required this.id,
+    required this.name,
+    required this.type,
+    required this.quantity,
+    required this.createdAt,
+  });
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'name': name, 'createdAt': createdAt.toIso8601String()};
+    return {
+      'id': id,
+      'name': name,
+      'type': type,
+      'quantity': quantity,
+      'createdAt': createdAt.toIso8601String()
+    };
   }
 
   factory FridgeItem.fromMap(Map<String, dynamic> map) {
     return FridgeItem(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
+      type: map['type'] ?? 'refrigerated',
+      quantity: map['quantity'] ?? '1',
       createdAt: DateTime.parse(
         map['createdAt'] ?? DateTime.now().toIso8601String(),
       ),
@@ -50,18 +66,25 @@ class FridgeDataService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs.map((doc) {
-            return FridgeItem.fromMap(doc.data());
-          }).toList();
-        });
+      return snapshot.docs.map((doc) {
+        return FridgeItem.fromMap(doc.data());
+      }).toList();
+    });
   }
 
   // 添加食物项目
-  Future<void> addFridgeItem(String name) async {
+  Future<void> addFridgeItem(String name,
+      {String type = 'refrigerated', String quantity = '1'}) async {
     if (userId == null) return;
 
     final itemId = DateTime.now().millisecondsSinceEpoch.toString();
-    final item = FridgeItem(id: itemId, name: name, createdAt: DateTime.now());
+    final item = FridgeItem(
+      id: itemId,
+      name: name,
+      type: type,
+      quantity: quantity,
+      createdAt: DateTime.now(),
+    );
 
     await _firestoreInstance
         .collection('users')

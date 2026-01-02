@@ -107,8 +107,10 @@ class FridgeHome extends StatefulWidget {
 }
 
 class _FridgeHomeState extends State<FridgeHome> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _quantityController = TextEditingController();
   late final FridgeDataService _dataService;
+  String _selectedType = 'refrigerated';
 
   @override
   void initState() {
@@ -118,15 +120,23 @@ class _FridgeHomeState extends State<FridgeHome> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
+    _quantityController.dispose();
     super.dispose();
   }
 
   void _addFood() {
-    final name = _controller.text.trim();
-    if (name.isNotEmpty) {
-      _dataService.addFridgeItem(name);
-      _controller.clear();
+    final name = _nameController.text.trim();
+    final quantity = _quantityController.text.trim();
+    if (name.isNotEmpty && quantity.isNotEmpty) {
+      _dataService.addFridgeItem(
+        name,
+        type: _selectedType,
+        quantity: quantity,
+      );
+      _nameController.clear();
+      _quantityController.clear();
+      _selectedType = 'refrigerated';
     }
   }
 
@@ -341,24 +351,69 @@ class _FridgeHomeState extends State<FridgeHome> {
           // 添加食物输入框
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: '输入食物名称...',
-                      border: OutlineInputBorder(),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          hintText: '输入食物名称...',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSubmitted: (_) => _addFood(),
+                      ),
                     ),
-                    onSubmitted: (_) => _addFood(),
-                  ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        controller: _quantityController,
+                        decoration: const InputDecoration(
+                          hintText: '数量',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSubmitted: (_) => _addFood(),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(onPressed: _addFood, child: const Text('添加')),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedType,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'frozen',
+                            child: const Text('冷冻层'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'refrigerated',
+                            child: const Text('冷藏层'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedType = value ?? 'refrigerated';
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _addFood,
+                      child: const Text('添加'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          // 食物列表
+          // 食物列表 - 网格布局
           Expanded(
             child: StreamBuilder<List<FridgeItem>>(
               stream: _dataService.getFridgeItems(),
@@ -383,60 +438,182 @@ class _FridgeHomeState extends State<FridgeHome> {
                   );
                 }
 
-                return ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    return Dismissible(
-                      key: Key(item.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        color: Colors.red,
-                        child: const Icon(Icons.delete, color: Colors.white),
-                      ),
-                      onDismissed: (direction) {
-                        _removeFood(item.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${item.name} 已删除')),
-                        );
-                      },
-                      child: Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        child: ListTile(
-                          leading: Text(
-                            _getIcon(item.name),
-                            style: const TextStyle(fontSize: 24),
-                          ),
-                          title: Text(
-                            item.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            '添加时间: ${item.createdAt.toString().split('.')[0]}',
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _showDeleteDialog(context, item),
+                return Column(
+                  children: [
+                    // 冷冻层
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade100,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
                           ),
                         ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                color: Colors.white.withOpacity(0.8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                child: const Text(
+                                  '冷冻层',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: GridView.extent(
+                                maxCrossAxisExtent: 100,
+                                children: items
+                                    .where((food) => food.type == 'frozen')
+                                    .toList()
+                                    .map(
+                                      (item) => GestureDetector(
+                                        onLongPress: () {
+                                          _showDeleteDialog(context, item);
+                                        },
+                                        child: Container(
+                                          margin: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  _getIcon(item.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 40,
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: 4,
+                                                right: 4,
+                                                child: Text(
+                                                  item.quantity,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                    // 分隔线
+                    Container(height: 4, color: Colors.black),
+                    // 冷藏层
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade100,
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                color: Colors.white.withOpacity(0.8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                child: const Text(
+                                  '冷藏层',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: GridView.extent(
+                                maxCrossAxisExtent: 100,
+                                children: items
+                                    .where(
+                                      (food) => food.type == 'refrigerated',
+                                    )
+                                    .toList()
+                                    .map(
+                                      (item) => GestureDetector(
+                                        onLongPress: () {
+                                          _showDeleteDialog(context, item);
+                                        },
+                                        child: Container(
+                                          margin: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  _getIcon(item.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 40,
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                bottom: 4,
+                                                right: 4,
+                                                child: Text(
+                                                  item.quantity,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addFood,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: null,
     );
   }
 
