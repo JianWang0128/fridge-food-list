@@ -591,23 +591,10 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    item.name,
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(0xFF2D5016),
-                                                      fontFamily:
-                                                          'PressStart2P',
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                child: Text(
+                                                  _getIcon(item.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 40,
                                                   ),
                                                 ),
                                               ),
@@ -698,23 +685,10 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    item.name,
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(0xFF2D5016),
-                                                      fontFamily:
-                                                          'PressStart2P',
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                                child: Text(
+                                                  _getIcon(item.name),
+                                                  style: const TextStyle(
+                                                    fontSize: 40,
                                                   ),
                                                 ),
                                               ),
