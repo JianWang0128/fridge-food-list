@@ -118,7 +118,13 @@ class FridgeHome extends StatefulWidget {
 
 class _FridgeHomeState extends State<FridgeHome> {
   final TextEditingController _controller = TextEditingController();
-  final FridgeDataService _dataService = FridgeDataService();
+  late final FridgeDataService _dataService;
+
+  @override
+  void initState() {
+    super.initState();
+    _dataService = Provider.of<FridgeDataService>(context, listen: false);
+  }
 
   @override
   void dispose() {
