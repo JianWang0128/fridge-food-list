@@ -563,6 +563,11 @@ class _FridgeHomeState extends State<FridgeHome> {
                                                     style: const TextStyle(
                                                       fontSize: 40,
                                                       color: Colors.black,
+                                                      fontFamilyFallback: [
+                                                        'Noto Color Emoji',
+                                                        'Apple Color Emoji',
+                                                        'Segoe UI Emoji'
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
@@ -660,6 +665,11 @@ class _FridgeHomeState extends State<FridgeHome> {
                                                     style: const TextStyle(
                                                       fontSize: 40,
                                                       color: Colors.black,
+                                                      fontFamilyFallback: [
+                                                        'Noto Color Emoji',
+                                                        'Apple Color Emoji',
+                                                        'Segoe UI Emoji'
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
