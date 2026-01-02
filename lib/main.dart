@@ -235,6 +235,13 @@ class _FridgeHomeState extends State<FridgeHome> {
     return Icons.restaurant;
   }
 
+  String _getEmojiUrl(String emoji) {
+    // 将emoji转换为unicode码点
+    final codePoint = emoji.runes.first.toRadixString(16);
+    // 使用Twemoji CDN
+    return 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/$codePoint.png';
+  }
+
   String _getIcon(String name) {
     // 根据名称返回对应的emoji图标，使用模糊匹配
     final Map<String, String> iconMap = {
@@ -591,11 +598,19 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  _getIcon(item.name),
-                                                  style: const TextStyle(
-                                                    fontSize: 40,
-                                                  ),
+                                                child: Image.network(
+                                                  _getEmojiUrl(
+                                                      _getIcon(item.name)),
+                                                  width: 40,
+                                                  height: 40,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Text(
+                                                      _getIcon(item.name),
+                                                      style: const TextStyle(
+                                                          fontSize: 40),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                               Positioned(
@@ -685,11 +700,19 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  _getIcon(item.name),
-                                                  style: const TextStyle(
-                                                    fontSize: 40,
-                                                  ),
+                                                child: Image.network(
+                                                  _getEmojiUrl(
+                                                      _getIcon(item.name)),
+                                                  width: 40,
+                                                  height: 40,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Text(
+                                                      _getIcon(item.name),
+                                                      style: const TextStyle(
+                                                          fontSize: 40),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                               Positioned(
