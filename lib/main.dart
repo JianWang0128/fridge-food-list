@@ -557,13 +557,13 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: DefaultTextStyle(
-                                                  style: const TextStyle(
-                                                    fontSize: 40,
-                                                    color: Colors.black,
-                                                  ),
-                                                  child: Text(
-                                                    _getIcon(item.name),
+                                                child: RichText(
+                                                  text: TextSpan(
+                                                    text: _getIcon(item.name),
+                                                    style: const TextStyle(
+                                                      fontSize: 40,
+                                                      color: Colors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -654,13 +654,13 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: DefaultTextStyle(
-                                                  style: const TextStyle(
-                                                    fontSize: 40,
-                                                    color: Colors.black,
-                                                  ),
-                                                  child: Text(
-                                                    _getIcon(item.name),
+                                                child: RichText(
+                                                  text: TextSpan(
+                                                    text: _getIcon(item.name),
+                                                    style: const TextStyle(
+                                                      fontSize: 40,
+                                                      color: Colors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
