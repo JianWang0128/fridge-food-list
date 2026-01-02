@@ -104,14 +104,6 @@ class LocalFridgeDataService {
     return List.generate(maps.length, (i) => FridgeItem.fromMap(maps[i]));
   }
 
-  @Deprecated('Use getFridgeItems() instead')
-  Future<List<FridgeItem>> getFridgeItemsStream() async* {
-    while (true) {
-      yield await _getFridgeItemsAsync();
-      await Future.delayed(const Duration(milliseconds: 500));
-    }
-  }
-
   Future<void> addFridgeItem(
     String name, {
     String type = 'refrigerated',
