@@ -1,33 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_options.dart';
-import 'auth_service.dart';
-import 'fridge_data_service.dart';
-import 'login_page.dart';
+import 'local_auth_service.dart';
+import 'local_fridge_data_service.dart';
+import 'local_login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    // 初始化Firebase
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-
-    // 等待一小段时间确保Firebase完全初始化
-    await Future.delayed(const Duration(milliseconds: 500));
-  } catch (e) {
-    print('Firebase initialization failed: $e');
-  }
+  final authService = LocalAuthService();
+  await authService.initializeAuth();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthService()),
-        Provider(create: (_) => FridgeDataService()),
-      ],
+    ChangeNotifierProvider.value(
+      value: authService,
       child: const FridgeApp(),
     ),
   );
@@ -39,10 +24,10 @@ class FridgeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('FridgeApp build called');
-    
+
     // 星露谷风格主题
     const pixelFontFamily = 'PressStart2P';
-    
+
     return MaterialApp(
       title: '冰箱食物清单',
       theme: ThemeData(
@@ -51,7 +36,7 @@ class FridgeApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF4E4C1), // 米色背景
         useMaterial3: false,
         fontFamily: pixelFontFamily,
-        
+
         // 文本主题 - 像素风格
         textTheme: const TextTheme(
           displayLarge: TextStyle(
@@ -72,7 +57,7 @@ class FridgeApp extends StatelessWidget {
             color: Color(0xFFFFFFFF),
           ),
         ),
-        
+
         // 按钮主题
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -90,11 +75,12 @@ class FridgeApp extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 下拉按钮主题
         dropdownMenuTheme: DropdownMenuThemeData(
           inputDecorationTheme: InputDecorationTheme(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             filled: true,
             fillColor: const Color(0xFFFFFFFF),
             border: OutlineInputBorder(
@@ -107,10 +93,11 @@ class FridgeApp extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // 输入框主题
         inputDecorationTheme: InputDecorationTheme(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           filled: true,
           fillColor: const Color(0xFFFFFFFF),
           border: OutlineInputBorder(
@@ -130,7 +117,7 @@ class FridgeApp extends StatelessWidget {
             color: Color(0xFF999999),
           ),
         ),
-        
+
         // AppBar主题
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF2D5016),
@@ -155,55 +142,20 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
+    final authService = Provider.of<LocalAuthService>(context);
 
-    return StreamBuilder<User?>(
-      stream: authService.authStateChanges,
-      builder: (context, snapshot) {
-        // 处理错误状态
-        if (snapshot.hasError) {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Firebase连接错误'),
-                  const SizedBox(height: 16),
-                  Text(snapshot.error.toString()),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // 重新加载应用
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => const FridgeApp()),
-                      );
-                    },
-                    child: const Text('重试'),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+    if (authService.isLoggedIn && authService.currentUser != null) {
+      return FridgeHome(username: authService.currentUser!);
+    }
 
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasData) {
-          return const FridgeHome();
-        }
-
-        return LoginPage(authService: authService);
-      },
-    );
+    return LocalLoginPage(authService: authService);
   }
 }
 
 class FridgeHome extends StatefulWidget {
-  const FridgeHome({super.key});
+  final String username;
+
+  const FridgeHome({Key? key, required this.username}) : super(key: key);
 
   @override
   State<FridgeHome> createState() => _FridgeHomeState();
@@ -212,13 +164,13 @@ class FridgeHome extends StatefulWidget {
 class _FridgeHomeState extends State<FridgeHome> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
-  late final FridgeDataService _dataService;
+  late final LocalFridgeDataService _dataService;
   String _selectedType = 'refrigerated';
 
   @override
   void initState() {
     super.initState();
-    _dataService = Provider.of<FridgeDataService>(context, listen: false);
+    _dataService = LocalFridgeDataService(widget.username);
   }
 
   @override
@@ -239,7 +191,9 @@ class _FridgeHomeState extends State<FridgeHome> {
       );
       _nameController.clear();
       _quantityController.clear();
-      _selectedType = 'refrigerated';
+      setState(() {
+        _selectedType = 'refrigerated';
+      });
     }
   }
 
@@ -435,16 +389,16 @@ class _FridgeHomeState extends State<FridgeHome> {
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
+    final authService = Provider.of<LocalAuthService>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('冰箱食物清单'),
+        title: Text('${widget.username}的冰箱'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              await authService.signOut();
+              await authService.logout();
             },
           ),
         ],
