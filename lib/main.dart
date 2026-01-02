@@ -43,10 +43,14 @@ class FridgeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('FridgeApp build called');
     return MaterialApp(
       title: '冰箱食物清单',
       theme: ThemeData(primarySwatch: Colors.green, useMaterial3: true),
-      home: const AuthWrapper(),
+      home: Scaffold(
+        appBar: AppBar(title: const Text('测试页面')),
+        body: const Center(child: Text('如果您能看到这个，说明应用正常工作了！')),
+      ),
     );
   }
 }
