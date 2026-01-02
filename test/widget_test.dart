@@ -5,7 +5,7 @@ import 'package:fridge_food_list/main.dart';
 void main() {
   testWidgets('App displays fridge sections', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(FridgeApp());
+    await tester.pumpWidget(const FridgeHome());
 
     // Verify that the app title is displayed.
     expect(find.text('冰箱食材列表'), findsOneWidget);
