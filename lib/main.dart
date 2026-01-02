@@ -557,11 +557,13 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  _getIcon(item.name),
+                                                child: DefaultTextStyle(
                                                   style: const TextStyle(
                                                     fontSize: 40,
                                                     color: Colors.black,
+                                                  ),
+                                                  child: Text(
+                                                    _getIcon(item.name),
                                                   ),
                                                 ),
                                               ),
@@ -652,11 +654,13 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  _getIcon(item.name),
+                                                child: DefaultTextStyle(
                                                   style: const TextStyle(
                                                     fontSize: 40,
                                                     color: Colors.black,
+                                                  ),
+                                                  child: Text(
+                                                    _getIcon(item.name),
                                                   ),
                                                 ),
                                               ),
