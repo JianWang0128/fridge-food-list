@@ -24,16 +24,26 @@ class FridgeItem {
 }
 
 class FridgeDataService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseFirestore? _firestore;
+  FirebaseAuth? _auth;
 
-  String? get userId => _auth.currentUser?.uid;
+  FirebaseFirestore get _firestoreInstance {
+    _firestore ??= FirebaseFirestore.instance;
+    return _firestore!;
+  }
+
+  FirebaseAuth get _authInstance {
+    _auth ??= FirebaseAuth.instance;
+    return _auth!;
+  }
+
+  String? get userId => _authInstance.currentUser?.uid;
 
   // 获取用户的冰箱食物列表
   Stream<List<FridgeItem>> getFridgeItems() {
     if (userId == null) return Stream.value([]);
 
-    return _firestore
+    return _firestoreInstance
         .collection('users')
         .doc(userId)
         .collection('fridge_items')
@@ -53,7 +63,7 @@ class FridgeDataService {
     final itemId = DateTime.now().millisecondsSinceEpoch.toString();
     final item = FridgeItem(id: itemId, name: name, createdAt: DateTime.now());
 
-    await _firestore
+    await _firestoreInstance
         .collection('users')
         .doc(userId)
         .collection('fridge_items')
@@ -65,7 +75,7 @@ class FridgeDataService {
   Future<void> removeFridgeItem(String itemId) async {
     if (userId == null) return;
 
-    await _firestore
+    await _firestoreInstance
         .collection('users')
         .doc(userId)
         .collection('fridge_items')
@@ -77,8 +87,8 @@ class FridgeDataService {
   Future<void> clearAllItems() async {
     if (userId == null) return;
 
-    final batch = _firestore.batch();
-    final snapshot = await _firestore
+    final batch = _firestoreInstance.batch();
+    final snapshot = await _firestoreInstance
         .collection('users')
         .doc(userId)
         .collection('fridge_items')

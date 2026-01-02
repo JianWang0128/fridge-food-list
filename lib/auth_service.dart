@@ -3,23 +3,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AuthService extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseAuth? _auth;
+  FirebaseFirestore? _firestore;
 
-  User? get currentUser => _auth.currentUser;
+  FirebaseAuth get _authInstance {
+    _auth ??= FirebaseAuth.instance;
+    return _auth!;
+  }
+
+  FirebaseFirestore get _firestoreInstance {
+    _firestore ??= FirebaseFirestore.instance;
+    return _firestore!;
+  }
+
+  User? get currentUser => _authInstance.currentUser;
   bool get isSignedIn => currentUser != null;
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<User?> get authStateChanges => _authInstance.authStateChanges();
 
   // 注册新用户
   Future<UserCredential?> signUp(String email, String password) async {
     try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential result = await _authInstance
+          .createUserWithEmailAndPassword(email: email, password: password);
       // 创建用户数据文档
-      await _firestore.collection('users').doc(result.user!.uid).set({
+      await _firestoreInstance.collection('users').doc(result.user!.uid).set({
         'email': email,
         'createdAt': FieldValue.serverTimestamp(),
         'lastLogin': FieldValue.serverTimestamp(),
@@ -35,14 +43,14 @@ class AuthService extends ChangeNotifier {
   // 用户登录
   Future<UserCredential?> signIn(String email, String password) async {
     try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(
+      UserCredential result = await _authInstance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       // 更新最后登录时间
-      await _firestore.collection('users').doc(result.user!.uid).update({
-        'lastLogin': FieldValue.serverTimestamp(),
-      });
+      await _firestoreInstance.collection('users').doc(result.user!.uid).update(
+        {'lastLogin': FieldValue.serverTimestamp()},
+      );
       notifyListeners();
       return result;
     } catch (e) {
@@ -53,12 +61,12 @@ class AuthService extends ChangeNotifier {
 
   // 用户登出
   Future<void> signOut() async {
-    await _auth.signOut();
+    await _authInstance.signOut();
     notifyListeners();
   }
 
   // 重置密码
   Future<void> resetPassword(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
+    await _authInstance.sendPasswordResetEmail(email: email);
   }
 }
