@@ -236,10 +236,10 @@ class _FridgeHomeState extends State<FridgeHome> {
   }
 
   String _getEmojiUrl(String emoji) {
-    // 将emoji转换为unicode码点
-    final codePoint = emoji.runes.first.toRadixString(16);
-    // 使用Twemoji CDN
-    return 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/$codePoint.png';
+    // 将emoji转换为unicode码点序列（支持多码点emoji）
+    final codePoints = emoji.runes.map((r) => r.toRadixString(16)).join('-');
+    // 使用OpenMoji CDN（彩色PNG）
+    return 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/$codePoints.png';
   }
 
   String _getIcon(String name) {
@@ -598,17 +598,34 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  _getIcon(item.name),
-                                                  style: const TextStyle(
-                                                    fontSize: 40,
-                                                    fontFamily:
-                                                        'Apple Color Emoji',
-                                                    fontFamilyFallback: [
-                                                      'Segoe UI Emoji',
-                                                      'Noto Color Emoji'
-                                                    ],
-                                                  ),
+                                                child: Image.network(
+                                                  _getEmojiUrl(
+                                                      _getIcon(item.name)),
+                                                  width: 48,
+                                                  height: 48,
+                                                  fit: BoxFit.contain,
+                                                  loadingBuilder: (context,
+                                                      child, loadingProgress) {
+                                                    if (loadingProgress == null)
+                                                      return child;
+                                                    return const SizedBox(
+                                                      width: 48,
+                                                      height: 48,
+                                                      child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                                strokeWidth: 2),
+                                                      ),
+                                                    );
+                                                  },
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Text(
+                                                      _getIcon(item.name),
+                                                      style: const TextStyle(
+                                                          fontSize: 40),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                               Positioned(
@@ -698,17 +715,34 @@ class _FridgeHomeState extends State<FridgeHome> {
                                           child: Stack(
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  _getIcon(item.name),
-                                                  style: const TextStyle(
-                                                    fontSize: 40,
-                                                    fontFamily:
-                                                        'Apple Color Emoji',
-                                                    fontFamilyFallback: [
-                                                      'Segoe UI Emoji',
-                                                      'Noto Color Emoji'
-                                                    ],
-                                                  ),
+                                                child: Image.network(
+                                                  _getEmojiUrl(
+                                                      _getIcon(item.name)),
+                                                  width: 48,
+                                                  height: 48,
+                                                  fit: BoxFit.contain,
+                                                  loadingBuilder: (context,
+                                                      child, loadingProgress) {
+                                                    if (loadingProgress == null)
+                                                      return child;
+                                                    return const SizedBox(
+                                                      width: 48,
+                                                      height: 48,
+                                                      child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                                strokeWidth: 2),
+                                                      ),
+                                                    );
+                                                  },
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Text(
+                                                      _getIcon(item.name),
+                                                      style: const TextStyle(
+                                                          fontSize: 40),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                               Positioned(
