@@ -28,10 +28,12 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
 
     try {
       if (_isLogin) {
@@ -41,9 +43,11 @@ class _LoginPageState extends State<LoginPage> {
           _passwordController.text.trim(),
         );
         if (result == null) {
-          setState(() {
-            _errorMessage = '登录失败，请检查邮箱和密码';
-          });
+          if (mounted) {
+            setState(() {
+              _errorMessage = '登录失败，请检查邮箱和密码';
+            });
+          }
         }
       } else {
         // 注册
@@ -52,40 +56,52 @@ class _LoginPageState extends State<LoginPage> {
           _passwordController.text.trim(),
         );
         if (result == null) {
-          setState(() {
-            _errorMessage = '注册失败，请重试';
-          });
+          if (mounted) {
+            setState(() {
+              _errorMessage = '注册失败，请重试';
+            });
+          }
         }
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = '操作失败: ${e.toString()}';
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = '操作失败: ${e.toString()}';
+        });
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _resetPassword() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      setState(() {
-        _errorMessage = '请输入邮箱地址';
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = '请输入邮箱地址';
+        });
+      }
       return;
     }
 
     try {
       await widget.authService.resetPassword(email);
-      setState(() {
-        _errorMessage = '密码重置邮件已发送到您的邮箱';
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = '密码重置邮件已发送到您的邮箱';
+        });
+      }
     } catch (e) {
-      setState(() {
-        _errorMessage = '发送失败: ${e.toString()}';
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = '发送失败: ${e.toString()}';
+        });
+      }
     }
   }
 
@@ -203,10 +219,12 @@ class _LoginPageState extends State<LoginPage> {
                     Text(_isLogin ? '还没有账户？' : '已有账户？'),
                     TextButton(
                       onPressed: () {
-                        setState(() {
-                          _isLogin = !_isLogin;
-                          _errorMessage = null;
-                        });
+                        if (mounted) {
+                          setState(() {
+                            _isLogin = !_isLogin;
+                            _errorMessage = null;
+                          });
+                        }
                       },
                       child: Text(
                         _isLogin ? '立即注册' : '去登录',
