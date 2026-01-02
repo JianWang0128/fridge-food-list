@@ -25,7 +25,7 @@ echo ""
 
 # 重新构建Web版本
 echo "🔄 重新构建Web版本..."
-flutter build web --release
+flutter build web --release --base-href="/$REPO_NAME/"
 
 # 复制到docs文件夹
 echo "📁 更新docs文件夹..."
