@@ -198,7 +198,19 @@ class _FridgeHomeState extends State<FridgeHome> {
     _dataService.removeFridgeItem(itemId);
   }
 
-  Widget _buildFoodCard(FridgeItem item) {
+  Widget _buildFoodCard(FridgeItem? item) {
+    if (item == null) {
+      // 空格子
+      return Container(
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF0F0F0),
+          border: Border.all(color: const Color(0xFFCCCCCC), width: 2),
+          borderRadius: BorderRadius.circular(0),
+        ),
+      );
+    }
+
     return GestureDetector(
       onLongPress: () => showDialog(
         context: context,
@@ -268,6 +280,17 @@ class _FridgeHomeState extends State<FridgeHome> {
         ),
       ),
     );
+  }
+
+  List<FridgeItem?> _buildGridItems(
+      List<FridgeItem> items, int gridSize) {
+    final result = <FridgeItem?>[];
+    result.addAll(items);
+    // 填充空格子直到达到 gridSize
+    while (result.length < gridSize) {
+      result.add(null);
+    }
+    return result;
   }
 
   String _getEmojiUrl(String emoji) {
@@ -443,15 +466,13 @@ class _FridgeHomeState extends State<FridgeHome> {
 
                 final items = snapshot.data ?? [];
 
-                if (items.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      '冰箱是空的！\n添加一些食物吧 🍽️',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                  );
-                }
+                // 分离冷冻层和冷藏层的食物
+                final frozenItems = items.where((food) => food.type == 'frozen').toList();
+                final refrigeratedItems = items.where((food) => food.type == 'refrigerated').toList();
+                
+                // 创建固定大小的网格（各层 5x4 = 20 格）
+                final frozenGridItems = _buildGridItems(frozenItems, 20);
+                final refrigeratedGridItems = _buildGridItems(refrigeratedItems, 20);
 
                 return Column(
                   children: [
@@ -491,10 +512,9 @@ class _FridgeHomeState extends State<FridgeHome> {
                               ),
                             ),
                             Expanded(
-                              child: GridView.extent(
-                                maxCrossAxisExtent: 100,
-                                children: items
-                                    .where((food) => food.type == 'frozen')
+                              child: GridView.count(
+                                crossAxisCount: 5,
+                                children: frozenGridItems
                                     .map(_buildFoodCard)
                                     .toList(),
                               ),
@@ -541,11 +561,9 @@ class _FridgeHomeState extends State<FridgeHome> {
                               ),
                             ),
                             Expanded(
-                              child: GridView.extent(
-                                maxCrossAxisExtent: 100,
-                                children: items
-                                    .where(
-                                        (food) => food.type == 'refrigerated')
+                              child: GridView.count(
+                                crossAxisCount: 5,
+                                children: refrigeratedGridItems
                                     .map(_buildFoodCard)
                                     .toList(),
                               ),
