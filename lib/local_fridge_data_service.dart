@@ -16,6 +16,22 @@ class FridgeItem {
     required this.createdAt,
   });
 
+  FridgeItem copyWith({
+    String? id,
+    String? name,
+    String? type,
+    String? quantity,
+    DateTime? createdAt,
+  }) {
+    return FridgeItem(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      quantity: quantity ?? this.quantity,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -103,6 +119,17 @@ class LocalFridgeDataService {
 
     final jsonList = items.map((item) => item.toMap()).toList();
     await _prefs.setString(_getKey(), jsonEncode(jsonList));
+  }
+
+  Future<void> updateFridgeItem(FridgeItem updatedItem) async {
+    await _ensureInitialized();
+    final items = await _getFridgeItemsAsync();
+    final index = items.indexWhere((item) => item.id == updatedItem.id);
+    if (index != -1) {
+      items[index] = updatedItem;
+      final jsonList = items.map((item) => item.toMap()).toList();
+      await _prefs.setString(_getKey(), jsonEncode(jsonList));
+    }
   }
 
   Future<void> clearAllItems() async {

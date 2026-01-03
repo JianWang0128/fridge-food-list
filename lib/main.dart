@@ -198,6 +198,99 @@ class _FridgeHomeState extends State<FridgeHome> {
     _dataService.removeFridgeItem(itemId);
   }
 
+  void _updateFoodQuantity(FridgeItem item, String newQuantity) {
+    _dataService.updateFridgeItem(item.copyWith(quantity: newQuantity));
+  }
+
+  void _showQuantityDialog(FridgeItem item) {
+    int quantity = int.tryParse(item.quantity) ?? 1;
+    final quantityController = TextEditingController(text: quantity.toString());
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(item.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (quantity > 1) {
+                      quantity--;
+                      quantityController.text = quantity.toString();
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  child: const Text('−'),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 60,
+                  child: TextField(
+                    controller: quantityController,
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      final parsed = int.tryParse(value);
+                      if (parsed != null && parsed > 0) {
+                        quantity = parsed;
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    quantity++;
+                    quantityController.text = quantity.toString();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  child: const Text('+'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('取消'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _updateFoodQuantity(item, quantity.toString());
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('确认'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _removeFood(item.id);
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('删除', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildFoodCard(FridgeItem? item) {
     if (item == null) {
       // 空格子
@@ -212,26 +305,7 @@ class _FridgeHomeState extends State<FridgeHome> {
     }
 
     return GestureDetector(
-      onLongPress: () => showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('删除食物'),
-          content: Text('确定要删除 "${item.name}" 吗？'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('取消'),
-            ),
-            TextButton(
-              onPressed: () {
-                _removeFood(item.id);
-                Navigator.of(context).pop();
-              },
-              child: const Text('删除', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
-      ),
+      onTap: () => _showQuantityDialog(item),
       child: Container(
         margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
