@@ -205,14 +205,30 @@ class _FridgeHomeState extends State<FridgeHome> {
   void _showQuantityDialog(FridgeItem item) {
     int quantity = int.tryParse(item.quantity) ?? 1;
     final quantityController = TextEditingController(text: quantity.toString());
+    
+    // 格式化添加日期
+    final dateFormat = '${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')} ${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(item.name),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(item.name),
+            const SizedBox(height: 8),
+            Text(
+              '添加时间: $dateFormat',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const Text('数量'),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
