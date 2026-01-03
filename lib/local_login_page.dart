@@ -89,22 +89,22 @@ class _LocalLoginPageState extends State<LocalLoginPage> {
                       ),
                       filled: true,
                       fillColor: const Color(0xFFFFFFFF),
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(
                           color: Color(0xFF2D5016),
                           width: 3,
                         ),
                         borderRadius: BorderRadius.zero,
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
                           color: Color(0xFF2D5016),
                           width: 3,
                         ),
                         borderRadius: BorderRadius.zero,
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
                           color: Color(0xFFCC8B00),
                           width: 3,
                         ),
