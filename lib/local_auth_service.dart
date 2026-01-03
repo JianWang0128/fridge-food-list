@@ -15,22 +15,12 @@ class LocalAuthService extends ChangeNotifier {
   }
 
   Future<bool> login(String username) async {
-    if (username.trim().isEmpty) {
+    final trimmed = username.trim();
+    if (trimmed.isEmpty) {
       return false;
     }
 
-    _currentUser = username.trim();
-    await _prefs?.setString('current_user', _currentUser!);
-    notifyListeners();
-    return true;
-  }
-
-  Future<bool> register(String username) async {
-    if (username.trim().isEmpty) {
-      return false;
-    }
-
-    _currentUser = username.trim();
+    _currentUser = trimmed;
     await _prefs?.setString('current_user', _currentUser!);
     notifyListeners();
     return true;

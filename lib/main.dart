@@ -23,9 +23,6 @@ class FridgeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('FridgeApp build called');
-
-    // 星露谷风格主题
     const pixelFontFamily = 'PressStart2P';
 
     return MaterialApp(
@@ -201,50 +198,85 @@ class _FridgeHomeState extends State<FridgeHome> {
     _dataService.removeFridgeItem(itemId);
   }
 
-  IconData _getFoodIcon(String name) {
-    // 根据名称返回对应的Material Icon
-    if (name.contains('苹果') || name.contains('果')) return Icons.apple;
-    if (name.contains('肉') ||
-        name.contains('牛') ||
-        name.contains('猪') ||
-        name.contains('羊')) return Icons.food_bank;
-    if (name.contains('蛋')) return Icons.egg;
-    if (name.contains('菜') ||
-        name.contains('蔬') ||
-        name.contains('萝卜') ||
-        name.contains('黄瓜') ||
-        name.contains('西兰花') ||
-        name.contains('菠菜')) return Icons.grass;
-    if (name.contains('鱼') ||
-        name.contains('虾') ||
-        name.contains('蟹') ||
-        name.contains('海鲜')) return Icons.set_meal;
-    if (name.contains('面包') || name.contains('饼')) return Icons.bakery_dining;
-    if (name.contains('奶') || name.contains('牛奶')) return Icons.water_drop;
-    if (name.contains('冰') || name.contains('雪糕') || name.contains('冰激凌'))
-      return Icons.icecream;
-    if (name.contains('咖啡')) return Icons.coffee;
-    if (name.contains('茶')) return Icons.emoji_food_beverage;
-    if (name.contains('酒') || name.contains('啤')) return Icons.liquor;
-    if (name.contains('水') || name.contains('饮料')) return Icons.local_drink;
-    if (name.contains('糖') || name.contains('巧克力') || name.contains('甜'))
-      return Icons.cake;
-    if (name.contains('米') || name.contains('饭')) return Icons.rice_bowl;
-
-    // 默认图标
-    return Icons.restaurant;
+  Widget _buildFoodCard(FridgeItem item) {
+    return GestureDetector(
+      onLongPress: () => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('删除食物'),
+          content: Text('确定要删除 "${item.name}" 吗？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                _removeFood(item.id);
+                Navigator.of(context).pop();
+              },
+              child: const Text('删除', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF8DC),
+          border: Border.all(color: const Color(0xFF2D5016), width: 2),
+          borderRadius: BorderRadius.circular(0),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: Image.network(
+                _getEmojiUrl(_getIcon(item.name)),
+                width: 48,
+                height: 48,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Text(
+                    _getIcon(item.name),
+                    style: const TextStyle(fontSize: 40),
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 4,
+              right: 4,
+              child: Text(
+                item.quantity,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   String _getEmojiUrl(String emoji) {
-    // 将emoji转换为unicode码点序列（支持多码点emoji）
     final codePoints = emoji.runes.map((r) => r.toRadixString(16)).join('-');
-    // 使用OpenMoji CDN（彩色PNG）
     return 'https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/$codePoints.png';
   }
 
   String _getIcon(String name) {
-    // 根据名称返回对应的emoji图标，使用模糊匹配
-    final Map<String, String> iconMap = {
+    const foodIconMap = {
       '苹果': '🍎',
       '牛肉': '🥩',
       '鸡蛋': '🥚',
@@ -305,126 +337,11 @@ class _FridgeHomeState extends State<FridgeHome> {
       '水': '🥛',
     };
 
-    // 首先检查食物emoji Map
-    final Map<String, String> foodIconMap = {
-      "葡萄": "🍇",
-      "瓜": "🍈",
-      "西瓜": "🍉",
-      "柑橘": "🍊",
-      "柠檬": "🍋",
-      "酸橙": "🍋‍🟩",
-      "香蕉": "🍌",
-      "菠萝": "🍍",
-      "芒果": "🥭",
-      "红苹果": "🍎",
-      "青苹果": "🍏",
-      "梨": "🍐",
-      "桃": "🍑",
-      "樱桃": "🍒",
-      "草莓": "🍓",
-      "蓝莓": "🫐",
-      "奇异果": "🥝",
-      "番茄": "🍅",
-      "橄榄": "🫒",
-      "椰子": "🥥",
-      "牛油果": "🥑",
-      "茄子": "🍆",
-      "土豆": "🥔",
-      "胡萝卜": "🥕",
-      "玉米穗": "🌽",
-      "辣椒": "🌶️",
-      "灯笼椒": "🫑",
-      "黄瓜": "🥒",
-      "绿叶": "🥬",
-      "西兰花": "🥦",
-      "蒜": "🧄",
-      "洋葱": "🧅",
-      "花生": "🥜",
-      "豆子": "🫘",
-      "板栗": "🌰",
-      "姜根": "🫚",
-      "豌豆荚": "🫛",
-      "棕色蘑菇": "🍄‍🟫",
-      "面包": "🍞",
-      "羊角面包": "🥐",
-      "长棍面包": "🥖",
-      "大饼": "🫓",
-      "椒盐卷饼": "🥨",
-      "百吉饼": "🥯",
-      "薄煎饼": "🥞",
-      "胡扯": "🧇",
-      "奶酪角": "🧀",
-      "骨头上的肉": "🍖",
-      "家禽腿": "🍗",
-      "切肉": "🥩",
-      "熏肉": "🥓",
-      "汉堡包": "🍔",
-      "炸薯条": "🍟",
-      "比萨": "🍕",
-      "热狗": "🌭",
-      "三明治": "🥪",
-      "墨西哥卷饼": "🌯",
-      "塔可": "🫔",
-      "墨西哥粽子": "🫓",
-      "皮塔饼": "🥙",
-      "法式煎蛋卷": "🥐",
-      "煎蛋": "🥚",
-      "煮沸": "🥘",
-      "浅锅": "🫕",
-      "碗": "🥣",
-      "绿色沙拉": "🥗",
-      "爆米花": "🍿",
-      "黄油": "🧈",
-      "盐": "🧂",
-      "罐头食品": "🥫",
-      "糖果": "🍬",
-      "棒糖": "🍭",
-      "卡仕达酱": "🍮",
-      "蜜罐": "🍯",
-      "婴儿奶瓶": "🍼",
-      "一杯牛奶": "🥛",
-      "热饮": "☕",
-      "茶壶": "🫖",
-      "无柄茶杯": "🍵",
-      "清酒": "🍶",
-      "软木塞爆开的瓶子": "🍾",
-      "红酒杯": "🍷",
-      "鸡尾酒杯": "🍸",
-      "热带饮料": "🍹",
-      "啤酒杯": "🍺",
-      "叮当作响的啤酒杯": "🍻",
-      "叮当作响的眼镜": "🥂",
-      "玻璃杯": "🥃",
-      "倾倒液体": "🫗",
-      "带吸管的杯子": "🥤",
-      "珍珠奶茶": "🧋",
-      "饮料盒": "🧃",
-      "伴侣": "🧉",
-      "冰": "🧊",
-      "筷子": "🥢",
-      "带盘子的叉子和刀子": "🍽️",
-      "刀叉": "🍴",
-      "勺子": "🥄",
-      "菜刀": "🔪",
-      "罐": "🫙",
-      "双耳瓶": "🏺",
-    };
-
-    // 首先检查食物emoji Map
-    for (var entry in foodIconMap.entries) {
+    for (final entry in foodIconMap.entries) {
       if (name.contains(entry.key)) {
         return entry.value;
       }
     }
-
-    // 然后检查关键词Map
-    for (var entry in iconMap.entries) {
-      if (name.contains(entry.key)) {
-        return entry.value;
-      }
-    }
-
-    // 默认图标
     return '🍽️';
   }
 
@@ -578,72 +495,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                 maxCrossAxisExtent: 100,
                                 children: items
                                     .where((food) => food.type == 'frozen')
-                                    .toList()
-                                    .map(
-                                      (item) => GestureDetector(
-                                        onLongPress: () {
-                                          _showDeleteDialog(context, item);
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFFF8DC),
-                                            border: Border.all(
-                                              color: const Color(0xFF2D5016),
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(0),
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              Center(
-                                                child: Image.network(
-                                                  _getEmojiUrl(
-                                                      _getIcon(item.name)),
-                                                  width: 48,
-                                                  height: 48,
-                                                  fit: BoxFit.contain,
-                                                  loadingBuilder: (context,
-                                                      child, loadingProgress) {
-                                                    if (loadingProgress == null)
-                                                      return child;
-                                                    return const SizedBox(
-                                                      width: 48,
-                                                      height: 48,
-                                                      child: Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                                strokeWidth: 2),
-                                                      ),
-                                                    );
-                                                  },
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Text(
-                                                      _getIcon(item.name),
-                                                      style: const TextStyle(
-                                                          fontSize: 40),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                              Positioned(
-                                                bottom: 4,
-                                                right: 4,
-                                                child: Text(
-                                                  item.quantity,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
+                                    .map(_buildFoodCard)
                                     .toList(),
                               ),
                             ),
@@ -693,74 +545,8 @@ class _FridgeHomeState extends State<FridgeHome> {
                                 maxCrossAxisExtent: 100,
                                 children: items
                                     .where(
-                                      (food) => food.type == 'refrigerated',
-                                    )
-                                    .toList()
-                                    .map(
-                                      (item) => GestureDetector(
-                                        onLongPress: () {
-                                          _showDeleteDialog(context, item);
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFFF8DC),
-                                            border: Border.all(
-                                              color: const Color(0xFF2D5016),
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(0),
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              Center(
-                                                child: Image.network(
-                                                  _getEmojiUrl(
-                                                      _getIcon(item.name)),
-                                                  width: 48,
-                                                  height: 48,
-                                                  fit: BoxFit.contain,
-                                                  loadingBuilder: (context,
-                                                      child, loadingProgress) {
-                                                    if (loadingProgress == null)
-                                                      return child;
-                                                    return const SizedBox(
-                                                      width: 48,
-                                                      height: 48,
-                                                      child: Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                                strokeWidth: 2),
-                                                      ),
-                                                    );
-                                                  },
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Text(
-                                                      _getIcon(item.name),
-                                                      style: const TextStyle(
-                                                          fontSize: 40),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                              Positioned(
-                                                bottom: 4,
-                                                right: 4,
-                                                child: Text(
-                                                  item.quantity,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
+                                        (food) => food.type == 'refrigerated')
+                                    .map(_buildFoodCard)
                                     .toList(),
                               ),
                             ),
@@ -776,29 +562,6 @@ class _FridgeHomeState extends State<FridgeHome> {
         ],
       ),
       floatingActionButton: null,
-    );
-  }
-
-  void _showDeleteDialog(BuildContext context, FridgeItem item) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('删除食物'),
-        content: Text('确定要删除 "${item.name}" 吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () {
-              _removeFood(item.id);
-              Navigator.of(context).pop();
-            },
-            child: const Text('删除', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
   }
 }

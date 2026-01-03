@@ -70,12 +70,8 @@ class LocalFridgeDataService {
   Stream<List<FridgeItem>> getFridgeItems() async* {
     while (true) {
       yield await _getFridgeItemsAsync();
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 300));
     }
-  }
-
-  Future<List<FridgeItem>> getFridgeItemsOnce() async {
-    return await _getFridgeItemsAsync();
   }
 
   Future<void> addFridgeItem(
