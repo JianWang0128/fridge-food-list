@@ -163,6 +163,8 @@ class _FridgeHomeState extends State<FridgeHome> {
   final TextEditingController _quantityController = TextEditingController();
   late final LocalFridgeDataService _dataService;
   String _selectedType = 'refrigerated';
+  int _shelfLifeValue = 7;
+  String _shelfLifeUnit = 'day';
 
   @override
   void initState() {
@@ -185,11 +187,15 @@ class _FridgeHomeState extends State<FridgeHome> {
         name,
         type: _selectedType,
         quantity: quantity,
+        shelfLifeValue: _shelfLifeValue,
+        shelfLifeUnit: _shelfLifeUnit,
       );
       _nameController.clear();
       _quantityController.clear();
       setState(() {
         _selectedType = 'refrigerated';
+        _shelfLifeValue = 7;
+        _shelfLifeUnit = 'day';
       });
     }
   }
@@ -205,9 +211,16 @@ class _FridgeHomeState extends State<FridgeHome> {
   void _showQuantityDialog(FridgeItem item) {
     int quantity = int.tryParse(item.quantity) ?? 1;
     final quantityController = TextEditingController(text: quantity.toString());
-    
-    // 格式化添加日期
-    final dateFormat = '${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')} ${item.createdAt.hour.toString().padLeft(2, '0')}:${item.createdAt.minute.toString().padLeft(2, '0')}';
+
+    // 格式化添加日期 - 仅显示日期
+    final dateFormat =
+        '${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')}';
+
+    // 格式化保质期显示
+    final shelfLifeDisplay = item.shelfLifeValue != null &&
+            item.shelfLifeUnit != null
+        ? '保质期: ${item.shelfLifeValue}${_getShelfLifeUnitLabel(item.shelfLifeUnit!)}'
+        : '保质期: 未设置';
 
     showDialog(
       context: context,
@@ -219,7 +232,12 @@ class _FridgeHomeState extends State<FridgeHome> {
             Text(item.name),
             const SizedBox(height: 8),
             Text(
-              '添加时间: $dateFormat',
+              '添加日期: $dateFormat',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              shelfLifeDisplay,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -305,6 +323,15 @@ class _FridgeHomeState extends State<FridgeHome> {
         ),
       ),
     );
+  }
+
+  String _getShelfLifeUnitLabel(String unit) {
+    const unitLabels = {
+      'day': '天',
+      'month': '月',
+      'year': '年',
+    };
+    return unitLabels[unit] ?? unit;
   }
 
   Widget _buildFoodCard(FridgeItem? item) {
@@ -534,6 +561,84 @@ class _FridgeHomeState extends State<FridgeHome> {
                     ElevatedButton(
                       onPressed: _addFood,
                       child: const Text('添加'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // 保质期选择
+                Row(
+                  children: [
+                    const Text('保质期: '),
+                    Expanded(
+                      child: Slider(
+                        value: _shelfLifeValue.toDouble(),
+                        min: 1,
+                        max: 365,
+                        divisions: 364,
+                        label: _shelfLifeValue.toString(),
+                        onChanged: (value) {
+                          setState(() {
+                            _shelfLifeValue = value.toInt();
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      width: 70,
+                      child: Text(
+                        '$_shelfLifeValue${_getShelfLifeUnitLabel(_shelfLifeUnit)}',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        backgroundColor: _shelfLifeUnit == 'day'
+                            ? const Color(0xFF2D5016)
+                            : const Color(0xCC8B4513),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _shelfLifeUnit = 'day';
+                        });
+                      },
+                      child: const Text('天'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        backgroundColor: _shelfLifeUnit == 'month'
+                            ? const Color(0xFF2D5016)
+                            : const Color(0xCC8B4513),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _shelfLifeUnit = 'month';
+                        });
+                      },
+                      child: const Text('月'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        backgroundColor: _shelfLifeUnit == 'year'
+                            ? const Color(0xFF2D5016)
+                            : const Color(0xCC8B4513),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _shelfLifeUnit = 'year';
+                        });
+                      },
+                      child: const Text('年'),
                     ),
                   ],
                 ),

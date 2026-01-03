@@ -7,6 +7,8 @@ class FridgeItem {
   final String type; // 'frozen' 或 'refrigerated'
   final String quantity;
   final DateTime createdAt;
+  final int? shelfLifeValue; // 保质期数值
+  final String? shelfLifeUnit; // 保质期单位: 'day', 'month', 'year'
 
   FridgeItem({
     required this.id,
@@ -14,6 +16,8 @@ class FridgeItem {
     required this.type,
     required this.quantity,
     required this.createdAt,
+    this.shelfLifeValue,
+    this.shelfLifeUnit,
   });
 
   FridgeItem copyWith({
@@ -22,6 +26,8 @@ class FridgeItem {
     String? type,
     String? quantity,
     DateTime? createdAt,
+    int? shelfLifeValue,
+    String? shelfLifeUnit,
   }) {
     return FridgeItem(
       id: id ?? this.id,
@@ -29,6 +35,8 @@ class FridgeItem {
       type: type ?? this.type,
       quantity: quantity ?? this.quantity,
       createdAt: createdAt ?? this.createdAt,
+      shelfLifeValue: shelfLifeValue ?? this.shelfLifeValue,
+      shelfLifeUnit: shelfLifeUnit ?? this.shelfLifeUnit,
     );
   }
 
@@ -39,6 +47,8 @@ class FridgeItem {
       'type': type,
       'quantity': quantity,
       'createdAt': createdAt.toIso8601String(),
+      'shelfLifeValue': shelfLifeValue,
+      'shelfLifeUnit': shelfLifeUnit,
     };
   }
 
@@ -51,6 +61,8 @@ class FridgeItem {
       createdAt: DateTime.parse(
         map['createdAt'] ?? DateTime.now().toIso8601String(),
       ),
+      shelfLifeValue: map['shelfLifeValue'] as int?,
+      shelfLifeUnit: map['shelfLifeUnit'] as String?,
     );
   }
 }
@@ -94,6 +106,8 @@ class LocalFridgeDataService {
     String name, {
     String type = 'refrigerated',
     String quantity = '1',
+    int? shelfLifeValue,
+    String? shelfLifeUnit,
   }) async {
     await _ensureInitialized();
     final itemId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -103,6 +117,8 @@ class LocalFridgeDataService {
       type: type,
       quantity: quantity,
       createdAt: DateTime.now(),
+      shelfLifeValue: shelfLifeValue,
+      shelfLifeUnit: shelfLifeUnit,
     );
 
     final items = await _getFridgeItemsAsync();
