@@ -4,7 +4,7 @@ import 'local_auth_service.dart';
 import 'local_fridge_data_service.dart';
 import 'local_login_page.dart';
 
-// 可展开/收缩的单值选择器 - 点击后在原位置显示3行滚轮
+// 可展开/收缩的单值选择器 - 点击后在原位置悬浮显示3行滚轮，中心对齐覆盖原行
 class PickerField<T> extends StatefulWidget {
   final List<T> items;
   final T currentValue;
@@ -45,82 +45,97 @@ class _PickerFieldState<T> extends State<PickerField<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // 单值显示（收缩状态）
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _isExpanded = !_isExpanded;
-            });
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: _isExpanded
-                    ? const Color(0xFF2D5016)
-                    : const Color(0xFF2D5016),
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(4),
-              color: _isExpanded ? const Color(0xFFE8DDB0) : Colors.transparent,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.itemBuilder(widget.currentValue),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D5016),
-                  ),
-                ),
-                Icon(
-                  _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: const Color(0xFF2D5016),
-                ),
-              ],
-            ),
-          ),
-        ),
-        // 滚轮选择器（展开状态）
-        if (_isExpanded)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
+    const double collapsedHeight = 44;
+    const double wheelHeight = 150; // 三行可见（itemExtent=50）
+    final double overlayTop = (collapsedHeight - wheelHeight) / 2; // 让中间一行盖住原行
+
+    return SizedBox(
+      height: collapsedHeight,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // 单值显示（收缩状态）
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
             child: Container(
-              height: 150,
+              height: collapsedHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 border: Border.all(
                   color: const Color(0xFF2D5016),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(4),
-                color: const Color(0xFFE8DDB0),
+                color:
+                    _isExpanded ? const Color(0xFFE8DDB0) : Colors.transparent,
               ),
-              child: ListWheelScrollView(
-                controller: _controller,
-                itemExtent: 50,
-                onSelectedItemChanged: (index) {
-                  widget.onChanged(widget.items[index]);
-                },
-                children: widget.items
-                    .map((item) => Center(
-                          child: Text(
-                            widget.itemBuilder(item),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2D5016),
-                            ),
-                          ),
-                        ))
-                    .toList(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.itemBuilder(widget.currentValue),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D5016),
+                    ),
+                  ),
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: const Color(0xFF2D5016),
+                  ),
+                ],
               ),
             ),
           ),
-      ],
+
+          // 悬浮滚轮选择器（展开状态，中心对齐覆盖原行）
+          if (_isExpanded)
+            Positioned(
+              top: overlayTop,
+              left: 0,
+              right: 0,
+              child: Material(
+                elevation: 6,
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  height: wheelHeight,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: const Color(0xFF2D5016),
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                    color: const Color(0xFFE8DDB0),
+                  ),
+                  child: ListWheelScrollView(
+                    controller: _controller,
+                    itemExtent: 50,
+                    onSelectedItemChanged: (index) {
+                      widget.onChanged(widget.items[index]);
+                    },
+                    children: widget.items
+                        .map((item) => Center(
+                              child: Text(
+                                widget.itemBuilder(item),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2D5016),
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
