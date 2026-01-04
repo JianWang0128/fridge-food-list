@@ -165,6 +165,7 @@ class _FridgeHomeState extends State<FridgeHome> {
   String _selectedType = 'refrigerated';
   int _shelfLifeValue = 7;
   String _shelfLifeUnit = 'day';
+  bool _isAddPanelOpen = false;
 
   @override
   void initState() {
@@ -196,6 +197,7 @@ class _FridgeHomeState extends State<FridgeHome> {
         _selectedType = 'refrigerated';
         _shelfLifeValue = 7;
         _shelfLifeUnit = 'day';
+        _isAddPanelOpen = false;
       });
     }
   }
@@ -508,140 +510,157 @@ class _FridgeHomeState extends State<FridgeHome> {
             child: Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(
-                          hintText: '输入食物名称...',
-                          border: OutlineInputBorder(),
-                        ),
-                        onSubmitted: (_) => _addFood(),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 80,
-                      child: TextField(
-                        controller: _quantityController,
-                        decoration: const InputDecoration(
-                          hintText: '数量',
-                          border: OutlineInputBorder(),
-                        ),
-                        onSubmitted: (_) => _addFood(),
-                      ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _isAddPanelOpen = !_isAddPanelOpen;
+                        });
+                      },
+                      icon: Icon(_isAddPanelOpen ? Icons.close : Icons.add),
+                      label: Text(_isAddPanelOpen ? '收起' : '添加'),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DropdownButton<String>(
-                        isExpanded: true,
-                        value: _selectedType,
-                        items: [
-                          DropdownMenuItem(
-                            value: 'frozen',
-                            child: const Text('冷冻层'),
+                if (_isAddPanelOpen) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            hintText: '输入食物名称...',
+                            border: OutlineInputBorder(),
                           ),
-                          DropdownMenuItem(
-                            value: 'refrigerated',
-                            child: const Text('冷藏层'),
+                          onSubmitted: (_) => _addFood(),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 80,
+                        child: TextField(
+                          controller: _quantityController,
+                          decoration: const InputDecoration(
+                            hintText: '数量',
+                            border: OutlineInputBorder(),
                           ),
-                        ],
-                        onChanged: (value) {
+                          onSubmitted: (_) => _addFood(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          value: _selectedType,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'frozen',
+                              child: Text('冷冻层'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'refrigerated',
+                              child: Text('冷藏层'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedType = value ?? 'refrigerated';
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: _addFood,
+                        child: const Text('添加'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // 保质期选择
+                  Row(
+                    children: [
+                      const Text('保质期: '),
+                      Expanded(
+                        child: Slider(
+                          value: _shelfLifeValue.toDouble(),
+                          min: 1,
+                          max: 365,
+                          divisions: 364,
+                          label: _shelfLifeValue.toString(),
+                          onChanged: (value) {
+                            setState(() {
+                              _shelfLifeValue = value.toInt();
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 70,
+                        child: Text(
+                          '$_shelfLifeValue${_getShelfLifeUnitLabel(_shelfLifeUnit)}',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          backgroundColor: _shelfLifeUnit == 'day'
+                              ? const Color(0xFF2D5016)
+                              : const Color(0xCC8B4513),
+                        ),
+                        onPressed: () {
                           setState(() {
-                            _selectedType = value ?? 'refrigerated';
+                            _shelfLifeUnit = 'day';
                           });
                         },
+                        child: const Text('天'),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: _addFood,
-                      child: const Text('添加'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // 保质期选择
-                Row(
-                  children: [
-                    const Text('保质期: '),
-                    Expanded(
-                      child: Slider(
-                        value: _shelfLifeValue.toDouble(),
-                        min: 1,
-                        max: 365,
-                        divisions: 364,
-                        label: _shelfLifeValue.toString(),
-                        onChanged: (value) {
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          backgroundColor: _shelfLifeUnit == 'month'
+                              ? const Color(0xFF2D5016)
+                              : const Color(0xCC8B4513),
+                        ),
+                        onPressed: () {
                           setState(() {
-                            _shelfLifeValue = value.toInt();
+                            _shelfLifeUnit = 'month';
                           });
                         },
+                        child: const Text('月'),
                       ),
-                    ),
-                    SizedBox(
-                      width: 70,
-                      child: Text(
-                        '$_shelfLifeValue${_getShelfLifeUnitLabel(_shelfLifeUnit)}',
-                        textAlign: TextAlign.center,
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          backgroundColor: _shelfLifeUnit == 'year'
+                              ? const Color(0xFF2D5016)
+                              : const Color(0xCC8B4513),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _shelfLifeUnit = 'year';
+                          });
+                        },
+                        child: const Text('年'),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        backgroundColor: _shelfLifeUnit == 'day'
-                            ? const Color(0xFF2D5016)
-                            : const Color(0xCC8B4513),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _shelfLifeUnit = 'day';
-                        });
-                      },
-                      child: const Text('天'),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        backgroundColor: _shelfLifeUnit == 'month'
-                            ? const Color(0xFF2D5016)
-                            : const Color(0xCC8B4513),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _shelfLifeUnit = 'month';
-                        });
-                      },
-                      child: const Text('月'),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        backgroundColor: _shelfLifeUnit == 'year'
-                            ? const Color(0xFF2D5016)
-                            : const Color(0xCC8B4513),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _shelfLifeUnit = 'year';
-                        });
-                      },
-                      child: const Text('年'),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
