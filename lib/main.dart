@@ -664,14 +664,14 @@ class _FridgeHomeState extends State<FridgeHome> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // 添加食物输入框
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Row(
+          Column(
+            children: [
+              // 顶部添加按钮（不推挤内容）
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton.icon(
@@ -685,147 +685,19 @@ class _FridgeHomeState extends State<FridgeHome> {
                     ),
                   ],
                 ),
-                if (_isAddPanelOpen) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _nameController,
-                          decoration: const InputDecoration(
-                            hintText: '输入食物名称...',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSubmitted: (_) => _addFood(),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      SizedBox(
-                        width: 120,
-                        child: Row(
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 8),
-                              ),
-                              onPressed: () {
-                                final current =
-                                    int.tryParse(_quantityController.text) ?? 1;
-                                if (current > 1) {
-                                  _quantityController.text =
-                                      (current - 1).toString();
-                                }
-                              },
-                              child: const Text('−'),
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: TextField(
-                                controller: _quantityController,
-                                textAlign: TextAlign.center,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  hintText: '数量',
-                                  border: OutlineInputBorder(),
-                                ),
-                                onSubmitted: (_) => _addFood(),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 8),
-                              ),
-                              onPressed: () {
-                                final current =
-                                    int.tryParse(_quantityController.text) ?? 1;
-                                _quantityController.text =
-                                    (current + 1).toString();
-                              },
-                              child: const Text('+'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: _addFood,
-                        child: const Text('添加'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // 保质期选择 - 浮动模态选择器
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('距离过期还有:'),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // 数字选择器
-                          Expanded(
-                            child: PickerField<int>(
-                              items: _getNumberRangeForUnit(_shelfLifeUnit),
-                              currentValue: _shelfLifeValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  _shelfLifeValue = value;
-                                });
-                              },
-                              itemBuilder: (value) => value.toString(),
-                              label: '数值',
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          // 单位选择器
-                          Expanded(
-                            child: PickerField<String>(
-                              items: const ['日', '月', '年'],
-                              currentValue: _getUnitLabel(_shelfLifeUnit),
-                              onChanged: (value) {
-                                setState(() {
-                                  _shelfLifeUnit = _getUnitFromLabel(value);
-                                  // 根据新单位调整数字范围
-                                  final range =
-                                      _getNumberRangeForUnit(_shelfLifeUnit);
-                                  if (!range.contains(_shelfLifeValue)) {
-                                    _shelfLifeValue = range.first;
-                                  }
-                                });
-                              },
-                              itemBuilder: (value) => value,
-                              label: '单位',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-          // 食物列表 - 网格布局
-          Expanded(
-            child: StreamBuilder<List<FridgeItem>>(
-              stream: _dataService.getFridgeItems(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+              ),
+              // 食物列表 - 网格布局
+              Expanded(
+                child: StreamBuilder<List<FridgeItem>>(
+                  stream: _dataService.getFridgeItems(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                if (snapshot.hasError) {
-                  return Center(child: Text('错误: ${snapshot.error}'));
-                }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('错误: ${snapshot.error}'));
+                    }
 
                 final items = snapshot.data ?? [];
 
@@ -941,8 +813,164 @@ class _FridgeHomeState extends State<FridgeHome> {
                   ],
                 );
               },
+              ),
             ),
-          ),
+          ],
+        ),
+        if (_isAddPanelOpen)
+            Positioned(
+              top: 80,
+              left: 16,
+              right: 16,
+              child: Material(
+                elevation: 8,
+                borderRadius: BorderRadius.circular(8),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.55,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4E4C1),
+                      border:
+                          Border.all(color: const Color(0xFF2D5016), width: 2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _nameController,
+                                  decoration: const InputDecoration(
+                                    hintText: '输入食物名称...',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  onSubmitted: (_) => _addFood(),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                width: 120,
+                                child: Row(
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 8),
+                                      ),
+                                      onPressed: () {
+                                        final current = int.tryParse(
+                                              _quantityController.text,
+                                            ) ??
+                                            1;
+                                        if (current > 1) {
+                                          _quantityController.text =
+                                              (current - 1).toString();
+                                        }
+                                      },
+                                      child: const Text('−'),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _quantityController,
+                                        textAlign: TextAlign.center,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          hintText: '数量',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        onSubmitted: (_) => _addFood(),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 8),
+                                      ),
+                                      onPressed: () {
+                                        final current = int.tryParse(
+                                              _quantityController.text,
+                                            ) ??
+                                            1;
+                                        _quantityController.text =
+                                            (current + 1).toString();
+                                      },
+                                      child: const Text('+'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                onPressed: _addFood,
+                                child: const Text('添加'),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('距离过期还有:'),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: PickerField<int>(
+                                      items:
+                                          _getNumberRangeForUnit(_shelfLifeUnit),
+                                      currentValue: _shelfLifeValue,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _shelfLifeValue = value;
+                                        });
+                                      },
+                                      itemBuilder: (value) => value.toString(),
+                                      label: '数值',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: PickerField<String>(
+                                      items: const ['日', '月', '年'],
+                                      currentValue: _getUnitLabel(_shelfLifeUnit),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _shelfLifeUnit = _getUnitFromLabel(value);
+                                          final range =
+                                              _getNumberRangeForUnit(_shelfLifeUnit);
+                                          if (!range.contains(_shelfLifeValue)) {
+                                            _shelfLifeValue = range.first;
+                                          }
+                                        });
+                                      },
+                                      itemBuilder: (value) => value,
+                                      label: '单位',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
       floatingActionButton: null,
