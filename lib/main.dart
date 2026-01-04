@@ -350,7 +350,7 @@ class _FridgeHomeState extends State<FridgeHome> {
     if (name.isNotEmpty && quantity.isNotEmpty) {
       _dataService.addFridgeItem(
         name,
-        type: _selectedType,
+        type: _selectedTypeForAdd,
         quantity: quantity,
         expirationYear: _expirationYear,
         expirationMonth: _expirationMonth,
@@ -359,7 +359,7 @@ class _FridgeHomeState extends State<FridgeHome> {
       _nameController.clear();
       _quantityController.clear();
       setState(() {
-        _selectedType = _selectedTypeForAdd; // 使用选定的类型
+        _selectedType = _selectedTypeForAdd;
         _expirationYear = 2026;
         _expirationMonth = 1;
         _expirationDay = 1;
