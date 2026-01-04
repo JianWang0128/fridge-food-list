@@ -714,28 +714,31 @@ class _FridgeHomeState extends State<FridgeHome> {
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              // 顶部添加按钮（不推挤内容）
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _isAddPanelOpen = !_isAddPanelOpen;
-                        });
-                      },
-                      icon: Icon(_isAddPanelOpen ? Icons.close : Icons.add),
-                      label: Text(_isAddPanelOpen ? '收起' : '添加'),
-                    ),
-                  ],
+          // 禁用背景交互（当添加面板打开时）
+          IgnorePointer(
+            ignoring: _isAddPanelOpen,
+            child: Column(
+              children: [
+                // 顶部添加按钮（不推挤内容）
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _isAddPanelOpen = !_isAddPanelOpen;
+                          });
+                        },
+                        icon: Icon(_isAddPanelOpen ? Icons.close : Icons.add),
+                        label: Text(_isAddPanelOpen ? '收起' : '添加'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              // 食物列表 - 网格布局
-              Expanded(
+                // 食物列表 - 网格布局
+                Expanded(
                 child: StreamBuilder<List<FridgeItem>>(
                   stream: _dataService.getFridgeItems(),
                   builder: (context, snapshot) {
@@ -865,7 +868,22 @@ class _FridgeHomeState extends State<FridgeHome> {
                 ),
               ),
             ],
+            ),
           ),
+          // 添加面板打开时的半透明遮罩层
+          if (_isAddPanelOpen)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isAddPanelOpen = false;
+                  });
+                },
+                child: Container(
+                  color: Colors.black.withOpacity(0.3),
+                ),
+              ),
+            ),
           if (_isAddPanelOpen)
             Positioned(
               top: 80,
