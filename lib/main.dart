@@ -775,9 +775,9 @@ class _FridgeHomeState extends State<FridgeHome> {
                           .toList();
 
                       // 创建固定大小的网格（各层 5x4 = 20 格）
-                      final frozenGridItems = _buildGridItems(frozenItems, 10);
+                      final frozenGridItems = _buildGridItems(frozenItems, 20);
                       final refrigeratedGridItems =
-                          _buildGridItems(refrigeratedItems, 10);
+                          _buildGridItems(refrigeratedItems, 20);
 
                       return Column(
                         children: [
