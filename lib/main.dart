@@ -921,7 +921,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 8),
+                                      horizontal: 4, vertical: 8),
                                 ),
                                 onPressed: () {
                                   final current = int.tryParse(
@@ -952,7 +952,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 8),
+                                      horizontal: 4, vertical: 8),
                                 ),
                                 onPressed: () {
                                   final current = int.tryParse(
