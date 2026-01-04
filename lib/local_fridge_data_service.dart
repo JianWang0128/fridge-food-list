@@ -9,6 +9,9 @@ class FridgeItem {
   final DateTime createdAt;
   final int? shelfLifeValue; // 保质期数值
   final String? shelfLifeUnit; // 保质期单位: 'day', 'month', 'year'
+  final int? expirationYear; // 过期年份
+  final int? expirationMonth; // 过期月份
+  final int? expirationDay; // 过期日期
 
   FridgeItem({
     required this.id,
@@ -18,6 +21,9 @@ class FridgeItem {
     required this.createdAt,
     this.shelfLifeValue,
     this.shelfLifeUnit,
+    this.expirationYear,
+    this.expirationMonth,
+    this.expirationDay,
   });
 
   FridgeItem copyWith({
@@ -28,6 +34,9 @@ class FridgeItem {
     DateTime? createdAt,
     int? shelfLifeValue,
     String? shelfLifeUnit,
+    int? expirationYear,
+    int? expirationMonth,
+    int? expirationDay,
   }) {
     return FridgeItem(
       id: id ?? this.id,
@@ -37,6 +46,9 @@ class FridgeItem {
       createdAt: createdAt ?? this.createdAt,
       shelfLifeValue: shelfLifeValue ?? this.shelfLifeValue,
       shelfLifeUnit: shelfLifeUnit ?? this.shelfLifeUnit,
+      expirationYear: expirationYear ?? this.expirationYear,
+      expirationMonth: expirationMonth ?? this.expirationMonth,
+      expirationDay: expirationDay ?? this.expirationDay,
     );
   }
 
@@ -49,6 +61,9 @@ class FridgeItem {
       'createdAt': createdAt.toIso8601String(),
       'shelfLifeValue': shelfLifeValue,
       'shelfLifeUnit': shelfLifeUnit,
+      'expirationYear': expirationYear,
+      'expirationMonth': expirationMonth,
+      'expirationDay': expirationDay,
     };
   }
 
@@ -63,6 +78,9 @@ class FridgeItem {
       ),
       shelfLifeValue: map['shelfLifeValue'] as int?,
       shelfLifeUnit: map['shelfLifeUnit'] as String?,
+      expirationYear: map['expirationYear'] as int?,
+      expirationMonth: map['expirationMonth'] as int?,
+      expirationDay: map['expirationDay'] as int?,
     );
   }
 }
@@ -108,6 +126,9 @@ class LocalFridgeDataService {
     String quantity = '1',
     int? shelfLifeValue,
     String? shelfLifeUnit,
+    int? expirationYear,
+    int? expirationMonth,
+    int? expirationDay,
   }) async {
     await _ensureInitialized();
     final itemId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -119,6 +140,9 @@ class LocalFridgeDataService {
       createdAt: DateTime.now(),
       shelfLifeValue: shelfLifeValue,
       shelfLifeUnit: shelfLifeUnit,
+      expirationYear: expirationYear,
+      expirationMonth: expirationMonth,
+      expirationDay: expirationDay,
     );
 
     final items = await _getFridgeItemsAsync();

@@ -325,8 +325,9 @@ class _FridgeHomeState extends State<FridgeHome> {
   final TextEditingController _quantityController = TextEditingController();
   late final LocalFridgeDataService _dataService;
   String _selectedType = 'refrigerated';
-  int _shelfLifeValue = 7;
-  String _shelfLifeUnit = 'day';
+  int _expirationYear = 2026;
+  int _expirationMonth = 1;
+  int _expirationDay = 1;
   bool _isAddPanelOpen = false;
 
   @override
@@ -350,15 +351,17 @@ class _FridgeHomeState extends State<FridgeHome> {
         name,
         type: _selectedType,
         quantity: quantity,
-        shelfLifeValue: _shelfLifeValue,
-        shelfLifeUnit: _shelfLifeUnit,
+        expirationYear: _expirationYear,
+        expirationMonth: _expirationMonth,
+        expirationDay: _expirationDay,
       );
       _nameController.clear();
       _quantityController.clear();
       setState(() {
         _selectedType = 'refrigerated';
-        _shelfLifeValue = 7;
-        _shelfLifeUnit = 'day';
+        _expirationYear = 2026;
+        _expirationMonth = 1;
+        _expirationDay = 1;
         _isAddPanelOpen = false;
       });
     }
@@ -380,11 +383,12 @@ class _FridgeHomeState extends State<FridgeHome> {
     final dateFormat =
         '${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')}';
 
-    // 格式化保质期显示
-    final shelfLifeDisplay = item.shelfLifeValue != null &&
-            item.shelfLifeUnit != null
-        ? '保质期: ${item.shelfLifeValue}${_getShelfLifeUnitLabel(item.shelfLifeUnit!)}'
-        : '保质期: 未设置';
+    // 格式化过期日期显示
+    final expirationDisplay = item.expirationYear != null &&
+            item.expirationMonth != null &&
+            item.expirationDay != null
+        ? '保质期至: ${item.expirationYear}-${item.expirationMonth.toString().padLeft(2, '0')}-${item.expirationDay.toString().padLeft(2, '0')}'
+        : '保质期至: 未设置';
 
     showDialog(
       context: context,
@@ -401,7 +405,7 @@ class _FridgeHomeState extends State<FridgeHome> {
             ),
             const SizedBox(height: 4),
             Text(
-              shelfLifeDisplay,
+              expirationDisplay,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -487,6 +491,24 @@ class _FridgeHomeState extends State<FridgeHome> {
         ),
       ),
     );
+  }
+
+  List<int> _getYearRange() {
+    return List.generate(11, (i) => 2026 + i); // 2026-2036
+  }
+
+  List<int> _getMonthRange() {
+    return List.generate(12, (i) => i + 1); // 1-12
+  }
+
+  List<int> _getDayRange() {
+    // 根据选择的年月返回该月的天数
+    final daysInMonth = DateTime(_expirationYear, _expirationMonth + 1, 0).day;
+    return List.generate(daysInMonth, (i) => i + 1);
+  }
+
+  int _getDaysInMonth(int year, int month) {
+    return DateTime(year, month + 1, 0).day;
   }
 
   String _getShelfLifeUnitLabel(String unit) {
@@ -949,45 +971,67 @@ class _FridgeHomeState extends State<FridgeHome> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('距离过期还有:'),
+                              const Text('保质期至:'),
                               const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  // 年份选择
                                   Expanded(
                                     child: PickerField<int>(
-                                      items: _getNumberRangeForUnit(
-                                          _shelfLifeUnit),
-                                      currentValue: _shelfLifeValue,
+                                      items: _getYearRange(),
+                                      currentValue: _expirationYear,
                                       onChanged: (value) {
                                         setState(() {
-                                          _shelfLifeValue = value;
-                                        });
-                                      },
-                                      itemBuilder: (value) => value.toString(),
-                                      label: '数值',
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: PickerField<String>(
-                                      items: const ['日', '月', '年'],
-                                      currentValue:
-                                          _getUnitLabel(_shelfLifeUnit),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _shelfLifeUnit =
-                                              _getUnitFromLabel(value);
-                                          final range = _getNumberRangeForUnit(
-                                              _shelfLifeUnit);
-                                          if (!range
-                                              .contains(_shelfLifeValue)) {
-                                            _shelfLifeValue = range.first;
+                                          _expirationYear = value;
+                                          // 检查日期是否有效
+                                          final maxDay = _getDaysInMonth(
+                                              _expirationYear,
+                                              _expirationMonth);
+                                          if (_expirationDay > maxDay) {
+                                            _expirationDay = maxDay;
                                           }
                                         });
                                       },
-                                      itemBuilder: (value) => value,
-                                      label: '单位',
+                                      itemBuilder: (value) => value.toString(),
+                                      label: '年',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // 月份选择
+                                  Expanded(
+                                    child: PickerField<int>(
+                                      items: _getMonthRange(),
+                                      currentValue: _expirationMonth,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _expirationMonth = value;
+                                          // 检查日期是否有效
+                                          final maxDay = _getDaysInMonth(
+                                              _expirationYear,
+                                              _expirationMonth);
+                                          if (_expirationDay > maxDay) {
+                                            _expirationDay = maxDay;
+                                          }
+                                        });
+                                      },
+                                      itemBuilder: (value) => value.toString(),
+                                      label: '月',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  // 日期选择
+                                  Expanded(
+                                    child: PickerField<int>(
+                                      items: _getDayRange(),
+                                      currentValue: _expirationDay,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _expirationDay = value;
+                                        });
+                                      },
+                                      itemBuilder: (value) => value.toString(),
+                                      label: '日',
                                     ),
                                   ),
                                 ],
