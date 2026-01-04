@@ -739,135 +739,135 @@ class _FridgeHomeState extends State<FridgeHome> {
                 ),
                 // 食物列表 - 网格布局
                 Expanded(
-                child: StreamBuilder<List<FridgeItem>>(
-                  stream: _dataService.getFridgeItems(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                  child: StreamBuilder<List<FridgeItem>>(
+                    stream: _dataService.getFridgeItems(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                    if (snapshot.hasError) {
-                      return Center(child: Text('错误: ${snapshot.error}'));
-                    }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('错误: ${snapshot.error}'));
+                      }
 
-                    final items = snapshot.data ?? [];
+                      final items = snapshot.data ?? [];
 
-                    // 分离冷冻层和冷藏层的食物
-                    final frozenItems =
-                        items.where((food) => food.type == 'frozen').toList();
-                    final refrigeratedItems = items
-                        .where((food) => food.type == 'refrigerated')
-                        .toList();
+                      // 分离冷冻层和冷藏层的食物
+                      final frozenItems =
+                          items.where((food) => food.type == 'frozen').toList();
+                      final refrigeratedItems = items
+                          .where((food) => food.type == 'refrigerated')
+                          .toList();
 
-                    // 创建固定大小的网格（各层 5x4 = 20 格）
-                    final frozenGridItems = _buildGridItems(frozenItems, 10);
-                    final refrigeratedGridItems =
-                        _buildGridItems(refrigeratedItems, 10);
+                      // 创建固定大小的网格（各层 5x4 = 20 格）
+                      final frozenGridItems = _buildGridItems(frozenItems, 10);
+                      final refrigeratedGridItems =
+                          _buildGridItems(refrigeratedItems, 10);
 
-                    return Column(
-                      children: [
-                        // 冷冻层 - 星露谷蓝色
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFB3D9FF), // 冰蓝色
-                              border: Border.all(
-                                color: const Color(0xFF2D5016),
-                                width: 4,
+                      return Column(
+                        children: [
+                          // 冷冻层 - 星露谷蓝色
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFB3D9FF), // 冰蓝色
+                                border: Border.all(
+                                  color: const Color(0xFF2D5016),
+                                  width: 4,
+                                ),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(0),
+                                  topRight: Radius.circular(0),
+                                ),
                               ),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(0),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    color: const Color(0xFF4A90E2),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    child: const Text(
-                                      '冷冻层',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFFFFFFFF),
-                                        fontFamily: 'PressStart2P',
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      color: const Color(0xFF4A90E2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      child: const Text(
+                                        '冷冻层',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFFFFFFFF),
+                                          fontFamily: 'PressStart2P',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: GridView.count(
-                                    crossAxisCount: 5,
-                                    children: frozenGridItems
-                                        .map(_buildFoodCard)
-                                        .toList(),
+                                  Expanded(
+                                    child: GridView.count(
+                                      crossAxisCount: 5,
+                                      children: frozenGridItems
+                                          .map(_buildFoodCard)
+                                          .toList(),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        // 分隔线 - 星露谷风格
-                        Container(height: 4, color: const Color(0xFF2D5016)),
-                        // 冷藏层 - 星露谷绿色
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD4EFC7), // 淡绿色
-                              border: Border.all(
-                                color: const Color(0xFF2D5016),
-                                width: 4,
+                          // 分隔线 - 星露谷风格
+                          Container(height: 4, color: const Color(0xFF2D5016)),
+                          // 冷藏层 - 星露谷绿色
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD4EFC7), // 淡绿色
+                                border: Border.all(
+                                  color: const Color(0xFF2D5016),
+                                  width: 4,
+                                ),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(0),
+                                  bottomRight: Radius.circular(0),
+                                ),
                               ),
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(0),
-                                bottomRight: Radius.circular(0),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    color: const Color(0xFF6DAB3B),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    child: const Text(
-                                      '冷藏层',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFFFFFFFF),
-                                        fontFamily: 'PressStart2P',
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      color: const Color(0xFF6DAB3B),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      child: const Text(
+                                        '冷藏层',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFFFFFFFF),
+                                          fontFamily: 'PressStart2P',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: GridView.count(
-                                    crossAxisCount: 5,
-                                    children: refrigeratedGridItems
-                                        .map(_buildFoodCard)
-                                        .toList(),
+                                  Expanded(
+                                    child: GridView.count(
+                                      crossAxisCount: 5,
+                                      children: refrigeratedGridItems
+                                          .map(_buildFoodCard)
+                                          .toList(),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
             ),
           ),
           // 添加面板打开时的半透明遮罩层
@@ -907,71 +907,62 @@ class _FridgeHomeState extends State<FridgeHome> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
+                          TextField(
+                            controller: _nameController,
+                            decoration: const InputDecoration(
+                              hintText: '输入食物名称...',
+                              border: OutlineInputBorder(),
+                            ),
+                            onSubmitted: (_) => _addFood(),
+                          ),
+                          const SizedBox(height: 12),
                           Row(
                             children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                onPressed: () {
+                                  final current = int.tryParse(
+                                        _quantityController.text,
+                                      ) ??
+                                      1;
+                                  if (current > 1) {
+                                    _quantityController.text =
+                                        (current - 1).toString();
+                                  }
+                                },
+                                child: const Text('−'),
+                              ),
+                              const SizedBox(width: 4),
                               Expanded(
                                 child: TextField(
-                                  controller: _nameController,
+                                  controller: _quantityController,
+                                  textAlign: TextAlign.center,
+                                  keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(
-                                    hintText: '输入食物名称...',
+                                    hintText: '数量',
                                     border: OutlineInputBorder(),
                                   ),
                                   onSubmitted: (_) => _addFood(),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              SizedBox(
-                                width: 120,
-                                child: Row(
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 8),
-                                      ),
-                                      onPressed: () {
-                                        final current = int.tryParse(
-                                              _quantityController.text,
-                                            ) ??
-                                            1;
-                                        if (current > 1) {
-                                          _quantityController.text =
-                                              (current - 1).toString();
-                                        }
-                                      },
-                                      child: const Text('−'),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _quantityController,
-                                        textAlign: TextAlign.center,
-                                        keyboardType: TextInputType.number,
-                                        decoration: const InputDecoration(
-                                          hintText: '数量',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        onSubmitted: (_) => _addFood(),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 8),
-                                      ),
-                                      onPressed: () {
-                                        final current = int.tryParse(
-                                              _quantityController.text,
-                                            ) ??
-                                            1;
-                                        _quantityController.text =
-                                            (current + 1).toString();
-                                      },
-                                      child: const Text('+'),
-                                    ),
-                                  ],
+                              const SizedBox(width: 4),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
                                 ),
+                                onPressed: () {
+                                  final current = int.tryParse(
+                                        _quantityController.text,
+                                      ) ??
+                                      1;
+                                  _quantityController.text =
+                                      (current + 1).toString();
+                                },
+                                child: const Text('+'),
                               ),
                             ],
                           ),
