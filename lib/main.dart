@@ -4,35 +4,36 @@ import 'local_auth_service.dart';
 import 'local_fridge_data_service.dart';
 import 'local_login_page.dart';
 
-// 滚轮选择器Widget
-class PickerColumn<T> extends StatefulWidget {
+// 简化的单值显示 + 点击展开浮动选择器
+class PickerField<T> extends StatefulWidget {
   final List<T> items;
-  final T initialValue;
+  final T currentValue;
   final ValueChanged<T> onChanged;
   final String Function(T) itemBuilder;
+  final String label;
 
-  const PickerColumn({
+  const PickerField({
     Key? key,
     required this.items,
-    required this.initialValue,
+    required this.currentValue,
     required this.onChanged,
     required this.itemBuilder,
+    required this.label,
   }) : super(key: key);
 
   @override
-  State<PickerColumn<T>> createState() => _PickerColumnState<T>();
+  State<PickerField<T>> createState() => _PickerFieldState<T>();
 }
 
-class _PickerColumnState<T> extends State<PickerColumn<T>> {
+class _PickerFieldState<T> extends State<PickerField<T>> {
   late FixedExtentScrollController _controller;
-  late int _initialIndex;
 
   @override
   void initState() {
     super.initState();
-    _initialIndex = widget.items.indexOf(widget.initialValue);
-    if (_initialIndex < 0) _initialIndex = 0;
-    _controller = FixedExtentScrollController(initialItem: _initialIndex);
+    final initialIndex = widget.items.indexOf(widget.currentValue);
+    _controller = FixedExtentScrollController(
+        initialItem: initialIndex >= 0 ? initialIndex : 0);
   }
 
   @override
@@ -41,25 +42,85 @@ class _PickerColumnState<T> extends State<PickerColumn<T>> {
     super.dispose();
   }
 
+  void _showPickerModal() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        height: 250,
+        decoration: const BoxDecoration(
+          color: Color(0xFFF4E4C1),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.label,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D5016),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('完成'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListWheelScrollView(
+                controller: _controller,
+                itemExtent: 50,
+                onSelectedItemChanged: (index) {
+                  widget.onChanged(widget.items[index]);
+                },
+                children: widget.items
+                    .map((item) => Center(
+                          child: Text(
+                            widget.itemBuilder(item),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D5016),
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      child: ListWheelScrollView(
-        controller: _controller,
-        itemExtent: 40,
-        onSelectedItemChanged: (index) {
-          widget.onChanged(widget.items[index]);
-        },
-        children: widget.items
-            .map((item) => Center(
-                  child: Text(
-                    widget.itemBuilder(item),
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ))
-            .toList(),
+    return GestureDetector(
+      onTap: _showPickerModal,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFF2D5016), width: 2),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          widget.itemBuilder(widget.currentValue),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D5016),
+          ),
+        ),
       ),
     );
   }
@@ -687,7 +748,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // 保质期选择 - 密码锁风格滚轮
+                  // 保质期选择 - 浮动模态选择器
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -696,25 +757,26 @@ class _FridgeHomeState extends State<FridgeHome> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // 数字列
+                          // 数字选择器
                           Expanded(
-                            child: PickerColumn<int>(
+                            child: PickerField<int>(
                               items: _getNumberRangeForUnit(_shelfLifeUnit),
-                              initialValue: _shelfLifeValue,
+                              currentValue: _shelfLifeValue,
                               onChanged: (value) {
                                 setState(() {
                                   _shelfLifeValue = value;
                                 });
                               },
                               itemBuilder: (value) => value.toString(),
+                              label: '数值',
                             ),
                           ),
                           const SizedBox(width: 16),
-                          // 单位列
+                          // 单位选择器
                           Expanded(
-                            child: PickerColumn<String>(
+                            child: PickerField<String>(
                               items: const ['日', '月', '年'],
-                              initialValue: _getUnitLabel(_shelfLifeUnit),
+                              currentValue: _getUnitLabel(_shelfLifeUnit),
                               onChanged: (value) {
                                 setState(() {
                                   _shelfLifeUnit = _getUnitFromLabel(value);
@@ -727,6 +789,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                 });
                               },
                               itemBuilder: (value) => value,
+                              label: '单位',
                             ),
                           ),
                         ],
