@@ -964,12 +964,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                 },
                                 child: const Text('+'),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
+                              const SizedBox(width: 8),
                               ElevatedButton(
                                 onPressed: _addFood,
                                 child: const Text('添加'),
