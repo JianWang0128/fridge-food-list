@@ -556,7 +556,9 @@ class _FridgeHomeState extends State<FridgeHome> {
     final expirationDate = DateTime(
         item.expirationYear!, item.expirationMonth!, item.expirationDay!);
     final today = DateTime.now();
-    final difference = expirationDate.difference(today).inDays;
+    // 只比较日期部分，不比较时间
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final difference = expirationDate.difference(todayDate).inDays;
 
     if (difference < 0) {
       return '已过期 ${(-difference)}天';
