@@ -3,33 +3,21 @@
     "short_name": "冰箱清单",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#4CAF50",
-    "theme_color": "#4CAF50",
+    "background_color": "#4E342E",
+    "theme_color": "#4E342E",
     "description": "轻松管理您的冰箱食物库存",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "icons/Icon-192.png",
+            "src": "Mini-Fridge 192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-512.png",
+            "src": "Mini-Fridge 512.png",
             "sizes": "512x512",
             "type": "image/png"
-        },
-        {
-            "src": "icons/Icon-maskable-192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
-        },
-        {
-            "src": "icons/Icon-maskable-512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
         }
     ]
 }
