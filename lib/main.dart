@@ -547,12 +547,15 @@ class _FridgeHomeState extends State<FridgeHome> {
     }
   }
 
-  Widget _buildFoodCard(dynamic item) {
+  Widget _buildFoodCard(dynamic item, {String? layerType}) {
     if (item == 'add') {
       // 添加按钮卡片
       return GestureDetector(
         onTap: () {
           setState(() {
+            if (layerType != null) {
+              _selectedTypeForAdd = layerType;
+            }
             _isAddPanelOpen = true;
           });
         },
@@ -820,10 +823,8 @@ class _FridgeHomeState extends State<FridgeHome> {
                                     child: GridView.count(
                                       crossAxisCount: 5,
                                       children: frozenGridItems.map((item) {
-                                        if (item == 'add') {
-                                          _selectedTypeForAdd = 'frozen';
-                                        }
-                                        return _buildFoodCard(item);
+                                        return _buildFoodCard(item,
+                                            layerType: 'frozen');
                                       }).toList(),
                                     ),
                                   ),
@@ -873,10 +874,8 @@ class _FridgeHomeState extends State<FridgeHome> {
                                       crossAxisCount: 5,
                                       children:
                                           refrigeratedGridItems.map((item) {
-                                        if (item == 'add') {
-                                          _selectedTypeForAdd = 'refrigerated';
-                                        }
-                                        return _buildFoodCard(item);
+                                        return _buildFoodCard(item,
+                                            layerType: 'refrigerated');
                                       }).toList(),
                                     ),
                                   ),
