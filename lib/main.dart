@@ -380,9 +380,12 @@ class _FridgeHomeState extends State<FridgeHome> {
     int quantity = int.tryParse(item.quantity) ?? 1;
     final quantityController = TextEditingController(text: quantity.toString());
 
-    // 格式化添加日期 - 仅显示日期
-    final dateFormat =
-        '${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')}';
+    // 格式化保质期至日期
+    final expirationDateFormat = item.expirationYear != null &&
+            item.expirationMonth != null &&
+            item.expirationDay != null
+        ? '${item.expirationYear}-${item.expirationMonth.toString().padLeft(2, '0')}-${item.expirationDay.toString().padLeft(2, '0')}'
+        : '未设置';
 
     // 计算剩余期限
     final remainingDaysDisplay = '剩余期限: ${_calculateRemainingDays(item)}';
@@ -397,7 +400,7 @@ class _FridgeHomeState extends State<FridgeHome> {
             Text(item.name),
             const SizedBox(height: 8),
             Text(
-              '添加日期: $dateFormat',
+              '保质期至: $expirationDateFormat',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 4),
@@ -544,11 +547,14 @@ class _FridgeHomeState extends State<FridgeHome> {
   }
 
   String _calculateRemainingDays(FridgeItem item) {
-    if (item.expirationYear == null || item.expirationMonth == null || item.expirationDay == null) {
+    if (item.expirationYear == null ||
+        item.expirationMonth == null ||
+        item.expirationDay == null) {
       return '未设置';
     }
 
-    final expirationDate = DateTime(item.expirationYear!, item.expirationMonth!, item.expirationDay!);
+    final expirationDate = DateTime(
+        item.expirationYear!, item.expirationMonth!, item.expirationDay!);
     final today = DateTime.now();
     final difference = expirationDate.difference(today).inDays;
 
@@ -573,7 +579,7 @@ class _FridgeHomeState extends State<FridgeHome> {
       final remainingDays = difference % 365;
       final months = (remainingDays / 30).floor();
       final days = remainingDays % 30;
-      
+
       if (months == 0 && days == 0) {
         return '剩余${years}年';
       } else if (days == 0) {
