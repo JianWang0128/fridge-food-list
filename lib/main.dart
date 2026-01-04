@@ -384,12 +384,8 @@ class _FridgeHomeState extends State<FridgeHome> {
     final dateFormat =
         '${item.createdAt.year}-${item.createdAt.month.toString().padLeft(2, '0')}-${item.createdAt.day.toString().padLeft(2, '0')}';
 
-    // 格式化过期日期显示
-    final expirationDisplay = item.expirationYear != null &&
-            item.expirationMonth != null &&
-            item.expirationDay != null
-        ? '保质期至: ${item.expirationYear}-${item.expirationMonth.toString().padLeft(2, '0')}-${item.expirationDay.toString().padLeft(2, '0')}'
-        : '保质期至: 未设置';
+    // 计算剩余期限
+    final remainingDaysDisplay = '剩余期限: ${_calculateRemainingDays(item)}';
 
     showDialog(
       context: context,
@@ -406,7 +402,7 @@ class _FridgeHomeState extends State<FridgeHome> {
             ),
             const SizedBox(height: 4),
             Text(
-              expirationDisplay,
+              remainingDaysDisplay,
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -544,6 +540,47 @@ class _FridgeHomeState extends State<FridgeHome> {
         return List.generate(10, (i) => i + 1); // 1-10
       default:
         return List.generate(30, (i) => i + 1);
+    }
+  }
+
+  String _calculateRemainingDays(FridgeItem item) {
+    if (item.expirationYear == null || item.expirationMonth == null || item.expirationDay == null) {
+      return '未设置';
+    }
+
+    final expirationDate = DateTime(item.expirationYear!, item.expirationMonth!, item.expirationDay!);
+    final today = DateTime.now();
+    final difference = expirationDate.difference(today).inDays;
+
+    if (difference < 0) {
+      return '已过期 ${(-difference)}天';
+    } else if (difference == 0) {
+      return '今天过期';
+    } else if (difference == 1) {
+      return '剩余1天';
+    } else if (difference <= 30) {
+      return '剩余${difference}天';
+    } else if (difference <= 365) {
+      final months = (difference / 30).floor();
+      final days = difference % 30;
+      if (days == 0) {
+        return '剩余${months}个月';
+      } else {
+        return '剩余${months}个月${days}天';
+      }
+    } else {
+      final years = (difference / 365).floor();
+      final remainingDays = difference % 365;
+      final months = (remainingDays / 30).floor();
+      final days = remainingDays % 30;
+      
+      if (months == 0 && days == 0) {
+        return '剩余${years}年';
+      } else if (days == 0) {
+        return '剩余${years}年${months}个月';
+      } else {
+        return '剩余${years}年${months}个月${days}天';
+      }
     }
   }
 
