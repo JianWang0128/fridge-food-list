@@ -553,29 +553,8 @@ class _FridgeHomeState extends State<FridgeHome> {
                   ),
                   const SizedBox(height: 8),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Expanded(
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: _selectedType,
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'frozen',
-                              child: Text('冷冻层'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'refrigerated',
-                              child: Text('冷藏层'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedType = value ?? 'refrigerated';
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
                       ElevatedButton(
                         onPressed: _addFood,
                         child: const Text('添加'),
@@ -686,9 +665,9 @@ class _FridgeHomeState extends State<FridgeHome> {
                     items.where((food) => food.type == 'refrigerated').toList();
 
                 // 创建固定大小的网格（各层 5x4 = 20 格）
-                final frozenGridItems = _buildGridItems(frozenItems, 20);
+                final frozenGridItems = _buildGridItems(frozenItems, 10);
                 final refrigeratedGridItems =
-                    _buildGridItems(refrigeratedItems, 20);
+                    _buildGridItems(refrigeratedItems, 10);
 
                 return Column(
                   children: [
