@@ -329,6 +329,7 @@ class _FridgeHomeState extends State<FridgeHome> {
   int _expirationMonth = 1;
   int _expirationDay = 1;
   bool _isAddPanelOpen = false;
+  String _selectedTypeForAdd = 'frozen'; // 记录从哪一层点击了添加
 
   @override
   void initState() {
@@ -358,7 +359,7 @@ class _FridgeHomeState extends State<FridgeHome> {
       _nameController.clear();
       _quantityController.clear();
       setState(() {
-        _selectedType = 'refrigerated';
+        _selectedType = _selectedTypeForAdd; // 使用选定的类型
         _expirationYear = 2026;
         _expirationMonth = 1;
         _expirationDay = 1;
@@ -546,7 +547,33 @@ class _FridgeHomeState extends State<FridgeHome> {
     }
   }
 
-  Widget _buildFoodCard(FridgeItem? item) {
+  Widget _buildFoodCard(dynamic item) {
+    if (item == 'add') {
+      // 添加按钮卡片
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _isAddPanelOpen = true;
+          });
+        },
+        child: Container(
+          margin: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF4E4C1),
+            border: Border.all(color: const Color(0xFF2D5016), width: 2),
+            borderRadius: BorderRadius.circular(0),
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.add,
+              size: 40,
+              color: Color(0xFF2D5016),
+            ),
+          ),
+        ),
+      );
+    }
+
     if (item == null) {
       // 空格子
       return Container(
@@ -559,8 +586,10 @@ class _FridgeHomeState extends State<FridgeHome> {
       );
     }
 
+    final foodItem = item as FridgeItem;
+
     return GestureDetector(
-      onTap: () => _showQuantityDialog(item),
+      onTap: () => _showQuantityDialog(foodItem),
       child: Container(
         margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
@@ -572,7 +601,7 @@ class _FridgeHomeState extends State<FridgeHome> {
           children: [
             Center(
               child: Image.network(
-                _getEmojiUrl(_getIcon(item.name)),
+                _getEmojiUrl(_getIcon(foodItem.name)),
                 width: 48,
                 height: 48,
                 fit: BoxFit.contain,
@@ -588,7 +617,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                 },
                 errorBuilder: (context, error, stackTrace) {
                   return Text(
-                    _getIcon(item.name),
+                    _getIcon(foodItem.name),
                     style: const TextStyle(fontSize: 40),
                   );
                 },
@@ -598,7 +627,7 @@ class _FridgeHomeState extends State<FridgeHome> {
               bottom: 4,
               right: 4,
               child: Text(
-                item.quantity,
+                foodItem.quantity,
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -611,12 +640,16 @@ class _FridgeHomeState extends State<FridgeHome> {
     );
   }
 
-  List<FridgeItem?> _buildGridItems(List<FridgeItem> items, int gridSize) {
-    final result = <FridgeItem?>[];
+  List<dynamic> _buildGridItems(List<FridgeItem> items, int gridSize) {
+    final result = <dynamic>[];
     result.addAll(items);
-    // 填充空格子直到达到 gridSize
-    while (result.length < gridSize) {
-      result.add(null);
+    // 最后一个位置放一个特殊的'add'标记
+    if (result.length < gridSize) {
+      result.add('add'); // 特殊标记表示这是一个添加按钮
+      // 填充剩余的空格子
+      while (result.length < gridSize) {
+        result.add(null);
+      }
     }
     return result;
   }
@@ -719,24 +752,6 @@ class _FridgeHomeState extends State<FridgeHome> {
             ignoring: _isAddPanelOpen,
             child: Column(
               children: [
-                // 顶部添加按钮（不推挤内容）
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _isAddPanelOpen = !_isAddPanelOpen;
-                          });
-                        },
-                        icon: Icon(_isAddPanelOpen ? Icons.close : Icons.add),
-                        label: Text(_isAddPanelOpen ? '收起' : '添加'),
-                      ),
-                    ],
-                  ),
-                ),
                 // 食物列表 - 网格布局
                 Expanded(
                   child: StreamBuilder<List<FridgeItem>>(
@@ -804,9 +819,12 @@ class _FridgeHomeState extends State<FridgeHome> {
                                   Expanded(
                                     child: GridView.count(
                                       crossAxisCount: 5,
-                                      children: frozenGridItems
-                                          .map(_buildFoodCard)
-                                          .toList(),
+                                      children: frozenGridItems.map((item) {
+                                        if (item == 'add') {
+                                          _selectedTypeForAdd = 'frozen';
+                                        }
+                                        return _buildFoodCard(item);
+                                      }).toList(),
                                     ),
                                   ),
                                 ],
@@ -853,9 +871,13 @@ class _FridgeHomeState extends State<FridgeHome> {
                                   Expanded(
                                     child: GridView.count(
                                       crossAxisCount: 5,
-                                      children: refrigeratedGridItems
-                                          .map(_buildFoodCard)
-                                          .toList(),
+                                      children:
+                                          refrigeratedGridItems.map((item) {
+                                        if (item == 'add') {
+                                          _selectedTypeForAdd = 'refrigerated';
+                                        }
+                                        return _buildFoodCard(item);
+                                      }).toList(),
                                     ),
                                   ),
                                 ],
