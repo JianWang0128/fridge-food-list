@@ -28,13 +28,14 @@ class PickerField<T> extends StatefulWidget {
 class _PickerFieldState<T> extends State<PickerField<T>> {
   late FixedExtentScrollController _controller;
   bool _isExpanded = false;
+  late int _currentIndex;
 
   @override
   void initState() {
     super.initState();
     final initialIndex = widget.items.indexOf(widget.currentValue);
-    _controller = FixedExtentScrollController(
-        initialItem: initialIndex >= 0 ? initialIndex : 0);
+    _currentIndex = initialIndex >= 0 ? initialIndex : 0;
+    _controller = FixedExtentScrollController(initialItem: _currentIndex);
   }
 
   @override
@@ -116,20 +117,26 @@ class _PickerFieldState<T> extends State<PickerField<T>> {
                     controller: _controller,
                     itemExtent: 50,
                     onSelectedItemChanged: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
                       widget.onChanged(widget.items[index]);
                     },
-                    children: widget.items
-                        .map((item) => Center(
-                              child: Text(
-                                widget.itemBuilder(item),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2D5016),
-                                ),
-                              ),
-                            ))
-                        .toList(),
+                    children: List.generate(widget.items.length, (idx) {
+                      final item = widget.items[idx];
+                      final isSelected = idx == _currentIndex;
+                      return Center(
+                        child: Text(
+                          widget.itemBuilder(item),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF2D5016)
+                                .withOpacity(isSelected ? 1.0 : 0.45),
+                          ),
+                        ),
+                      );
+                    }),
                   ),
                 ),
               ),
@@ -699,125 +706,126 @@ class _FridgeHomeState extends State<FridgeHome> {
                       return Center(child: Text('错误: ${snapshot.error}'));
                     }
 
-                final items = snapshot.data ?? [];
+                    final items = snapshot.data ?? [];
 
-                // 分离冷冻层和冷藏层的食物
-                final frozenItems =
-                    items.where((food) => food.type == 'frozen').toList();
-                final refrigeratedItems =
-                    items.where((food) => food.type == 'refrigerated').toList();
+                    // 分离冷冻层和冷藏层的食物
+                    final frozenItems =
+                        items.where((food) => food.type == 'frozen').toList();
+                    final refrigeratedItems = items
+                        .where((food) => food.type == 'refrigerated')
+                        .toList();
 
-                // 创建固定大小的网格（各层 5x4 = 20 格）
-                final frozenGridItems = _buildGridItems(frozenItems, 10);
-                final refrigeratedGridItems =
-                    _buildGridItems(refrigeratedItems, 10);
+                    // 创建固定大小的网格（各层 5x4 = 20 格）
+                    final frozenGridItems = _buildGridItems(frozenItems, 10);
+                    final refrigeratedGridItems =
+                        _buildGridItems(refrigeratedItems, 10);
 
-                return Column(
-                  children: [
-                    // 冷冻层 - 星露谷蓝色
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB3D9FF), // 冰蓝色
-                          border: Border.all(
-                            color: const Color(0xFF2D5016),
-                            width: 4,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(0),
-                            topRight: Radius.circular(0),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                color: const Color(0xFF4A90E2),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                child: const Text(
-                                  '冷冻层',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFFFFFF),
-                                    fontFamily: 'PressStart2P',
+                    return Column(
+                      children: [
+                        // 冷冻层 - 星露谷蓝色
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFB3D9FF), // 冰蓝色
+                              border: Border.all(
+                                color: const Color(0xFF2D5016),
+                                width: 4,
+                              ),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(0),
+                                topRight: Radius.circular(0),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    color: const Color(0xFF4A90E2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    child: const Text(
+                                      '冷冻层',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFFFFFFF),
+                                        fontFamily: 'PressStart2P',
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              child: GridView.count(
-                                crossAxisCount: 5,
-                                children: frozenGridItems
-                                    .map(_buildFoodCard)
-                                    .toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // 分隔线 - 星露谷风格
-                    Container(height: 4, color: const Color(0xFF2D5016)),
-                    // 冷藏层 - 星露谷绿色
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD4EFC7), // 淡绿色
-                          border: Border.all(
-                            color: const Color(0xFF2D5016),
-                            width: 4,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(0),
-                            bottomRight: Radius.circular(0),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                color: const Color(0xFF6DAB3B),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                child: const Text(
-                                  '冷藏层',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFFFFFF),
-                                    fontFamily: 'PressStart2P',
+                                Expanded(
+                                  child: GridView.count(
+                                    crossAxisCount: 5,
+                                    children: frozenGridItems
+                                        .map(_buildFoodCard)
+                                        .toList(),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            Expanded(
-                              child: GridView.count(
-                                crossAxisCount: 5,
-                                children: refrigeratedGridItems
-                                    .map(_buildFoodCard)
-                                    .toList(),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                );
-              },
+                        // 分隔线 - 星露谷风格
+                        Container(height: 4, color: const Color(0xFF2D5016)),
+                        // 冷藏层 - 星露谷绿色
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD4EFC7), // 淡绿色
+                              border: Border.all(
+                                color: const Color(0xFF2D5016),
+                                width: 4,
+                              ),
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(0),
+                                bottomRight: Radius.circular(0),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    color: const Color(0xFF6DAB3B),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    child: const Text(
+                                      '冷藏层',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFFFFFFF),
+                                        fontFamily: 'PressStart2P',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GridView.count(
+                                    crossAxisCount: 5,
+                                    children: refrigeratedGridItems
+                                        .map(_buildFoodCard)
+                                        .toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-        if (_isAddPanelOpen)
+            ],
+          ),
+          if (_isAddPanelOpen)
             Positioned(
               top: 80,
               left: 16,
@@ -929,8 +937,8 @@ class _FridgeHomeState extends State<FridgeHome> {
                                 children: [
                                   Expanded(
                                     child: PickerField<int>(
-                                      items:
-                                          _getNumberRangeForUnit(_shelfLifeUnit),
+                                      items: _getNumberRangeForUnit(
+                                          _shelfLifeUnit),
                                       currentValue: _shelfLifeValue,
                                       onChanged: (value) {
                                         setState(() {
@@ -945,13 +953,16 @@ class _FridgeHomeState extends State<FridgeHome> {
                                   Expanded(
                                     child: PickerField<String>(
                                       items: const ['日', '月', '年'],
-                                      currentValue: _getUnitLabel(_shelfLifeUnit),
+                                      currentValue:
+                                          _getUnitLabel(_shelfLifeUnit),
                                       onChanged: (value) {
                                         setState(() {
-                                          _shelfLifeUnit = _getUnitFromLabel(value);
-                                          final range =
-                                              _getNumberRangeForUnit(_shelfLifeUnit);
-                                          if (!range.contains(_shelfLifeValue)) {
+                                          _shelfLifeUnit =
+                                              _getUnitFromLabel(value);
+                                          final range = _getNumberRangeForUnit(
+                                              _shelfLifeUnit);
+                                          if (!range
+                                              .contains(_shelfLifeValue)) {
                                             _shelfLifeValue = range.first;
                                           }
                                         });
