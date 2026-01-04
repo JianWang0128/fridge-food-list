@@ -539,14 +539,52 @@ class _FridgeHomeState extends State<FridgeHome> {
                       ),
                       const SizedBox(width: 8),
                       SizedBox(
-                        width: 80,
-                        child: TextField(
-                          controller: _quantityController,
-                          decoration: const InputDecoration(
-                            hintText: '数量',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSubmitted: (_) => _addFood(),
+                        width: 120,
+                        child: Row(
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8),
+                              ),
+                              onPressed: () {
+                                final current =
+                                    int.tryParse(_quantityController.text) ?? 1;
+                                if (current > 1) {
+                                  _quantityController.text =
+                                      (current - 1).toString();
+                                }
+                              },
+                              child: const Text('−'),
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: TextField(
+                                controller: _quantityController,
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  hintText: '数量',
+                                  border: OutlineInputBorder(),
+                                ),
+                                onSubmitted: (_) => _addFood(),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8),
+                              ),
+                              onPressed: () {
+                                final current =
+                                    int.tryParse(_quantityController.text) ?? 1;
+                                _quantityController.text =
+                                    (current + 1).toString();
+                              },
+                              child: const Text('+'),
+                            ),
+                          ],
                         ),
                       ),
                     ],
