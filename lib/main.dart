@@ -605,17 +605,17 @@ class _FridgeHomeState extends State<FridgeHome> {
           });
         },
         child: Container(
-          margin: const EdgeInsets.all(4),
+          margin: const EdgeInsets.all(2),
           decoration: BoxDecoration(
-            color: const Color(0xFFF4E4C1),
-            border: Border.all(color: const Color(0xFF2D5016), width: 2),
+            color: const Color(0xFF8D6E63),
+            border: Border.all(color: const Color(0xFF5D4037), width: 3),
             borderRadius: BorderRadius.circular(0),
           ),
           child: const Center(
             child: Icon(
               Icons.add,
               size: 40,
-              color: Color(0xFF2D5016),
+              color: Color(0xFFD7CCC8),
             ),
           ),
         ),
@@ -623,12 +623,12 @@ class _FridgeHomeState extends State<FridgeHome> {
     }
 
     if (item == null) {
-      // 空格子
+      // 空格子 - 星露谷木质风格
       return Container(
-        margin: const EdgeInsets.all(4),
+        margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF),
-          border: Border.all(color: const Color(0xFF2D5016), width: 3),
+          color: const Color(0xFF6D4C41), // 深棕色
+          border: Border.all(color: const Color(0xFF5D4037), width: 3),
           borderRadius: BorderRadius.circular(0),
         ),
       );
@@ -639,10 +639,10 @@ class _FridgeHomeState extends State<FridgeHome> {
     return GestureDetector(
       onTap: () => _showQuantityDialog(foodItem),
       child: Container(
-        margin: const EdgeInsets.all(4),
+        margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF8DC),
-          border: Border.all(color: const Color(0xFF2D5016), width: 2),
+          color: const Color(0xFFBCAAA4), // 浅棕色
+          border: Border.all(color: const Color(0xFF5D4037), width: 3),
           borderRadius: BorderRadius.circular(0),
         ),
         child: Stack(
@@ -829,14 +829,14 @@ class _FridgeHomeState extends State<FridgeHome> {
 
                       return Column(
                         children: [
-                          // 冷冻层 - 星露谷蓝色
+                          // 冷冻层 - 星露谷木质风格
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFFB3D9FF), // 冰蓝色
+                                color: const Color(0xFF4E342E), // 深棕色木质
                                 border: Border.all(
-                                  color: const Color(0xFF2D5016),
-                                  width: 4,
+                                  color: const Color(0xFF3E2723),
+                                  width: 5,
                                 ),
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(0),
@@ -848,7 +848,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
-                                      color: const Color(0xFF4A90E2),
+                                      color: const Color(0xFF5D4037),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 8,
                                         vertical: 4,
@@ -858,7 +858,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFFFFFFFF),
+                                          color: Color(0xFFD7CCC8),
                                           fontFamily: 'PressStart2P',
                                         ),
                                       ),
@@ -878,15 +878,15 @@ class _FridgeHomeState extends State<FridgeHome> {
                             ),
                           ),
                           // 分隔线 - 星露谷风格
-                          Container(height: 4, color: const Color(0xFF2D5016)),
-                          // 冷藏层 - 星露谷绿色
+                          Container(height: 5, color: const Color(0xFF3E2723)),
+                          // 冷藏层 - 星露谷木质风格
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD4EFC7), // 淡绿色
+                                color: const Color(0xFF4E342E), // 深棕色木质
                                 border: Border.all(
-                                  color: const Color(0xFF2D5016),
-                                  width: 4,
+                                  color: const Color(0xFF3E2723),
+                                  width: 5,
                                 ),
                                 borderRadius: const BorderRadius.only(
                                   bottomLeft: Radius.circular(0),
@@ -898,7 +898,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
-                                      color: const Color(0xFF6DAB3B),
+                                      color: const Color(0xFF5D4037),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 8,
                                         vertical: 4,
@@ -908,7 +908,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFFFFFFFF),
+                                          color: Color(0xFFD7CCC8),
                                           fontFamily: 'PressStart2P',
                                         ),
                                       ),
