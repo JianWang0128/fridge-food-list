@@ -605,17 +605,17 @@ class _FridgeHomeState extends State<FridgeHome> {
           });
         },
         child: Container(
-          margin: const EdgeInsets.all(2),
+          margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFF8D6E63),
-            border: Border.all(color: const Color(0xFF5D4037), width: 3),
+            color: const Color(0xFFF5E6D3),
+            border: Border.all(color: const Color(0xFF8B6F47), width: 4),
             borderRadius: BorderRadius.circular(0),
           ),
           child: const Center(
             child: Icon(
               Icons.add,
               size: 40,
-              color: Color(0xFFD7CCC8),
+              color: Color(0xFF8B6F47),
             ),
           ),
         ),
@@ -625,10 +625,10 @@ class _FridgeHomeState extends State<FridgeHome> {
     if (item == null) {
       // 空格子 - 星露谷木质风格
       return Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFF6D4C41), // 深棕色
-          border: Border.all(color: const Color(0xFF5D4037), width: 3),
+          color: const Color(0xFFF5E6D3),
+          border: Border.all(color: const Color(0xFF8B6F47), width: 4),
           borderRadius: BorderRadius.circular(0),
         ),
       );
@@ -639,10 +639,10 @@ class _FridgeHomeState extends State<FridgeHome> {
     return GestureDetector(
       onTap: () => _showQuantityDialog(foodItem),
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFFBCAAA4), // 浅棕色
-          border: Border.all(color: const Color(0xFF5D4037), width: 3),
+          color: const Color(0xFFF5E6D3), // 亮米色
+          border: Border.all(color: const Color(0xFF8B6F47), width: 4),
           borderRadius: BorderRadius.circular(0),
         ),
         child: Stack(
@@ -679,6 +679,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B6F47),
                 ),
               ),
             ),
