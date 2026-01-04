@@ -607,15 +607,15 @@ class _FridgeHomeState extends State<FridgeHome> {
         child: Container(
           margin: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFFF5E6D3),
-            border: Border.all(color: const Color(0xFF8B6F47), width: 4),
+            color: const Color(0xFFFDF3E8),
+            border: Border.all(color: const Color(0xFF7A5C3A), width: 4),
             borderRadius: BorderRadius.circular(0),
           ),
           child: const Center(
             child: Icon(
               Icons.add,
               size: 40,
-              color: Color(0xFF8B6F47),
+              color: Color(0xFF7A5C3A),
             ),
           ),
         ),
@@ -627,8 +627,8 @@ class _FridgeHomeState extends State<FridgeHome> {
       return Container(
         margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5E6D3),
-          border: Border.all(color: const Color(0xFF8B6F47), width: 4),
+          color: const Color(0xFFFDF3E8),
+          border: Border.all(color: const Color(0xFF7A5C3A), width: 4),
           borderRadius: BorderRadius.circular(0),
         ),
       );
@@ -641,8 +641,8 @@ class _FridgeHomeState extends State<FridgeHome> {
       child: Container(
         margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5E6D3), // 亮米色
-          border: Border.all(color: const Color(0xFF8B6F47), width: 4),
+          color: const Color(0xFFFDF3E8), // 暖米色
+          border: Border.all(color: const Color(0xFF7A5C3A), width: 4),
           borderRadius: BorderRadius.circular(0),
         ),
         child: Stack(
@@ -679,7 +679,7 @@ class _FridgeHomeState extends State<FridgeHome> {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF8B6F47),
+                  color: Color(0xFF7A5C3A),
                 ),
               ),
             ),
