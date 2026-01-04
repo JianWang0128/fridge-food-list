@@ -113,30 +113,49 @@ class _PickerFieldState<T> extends State<PickerField<T>> {
                     borderRadius: BorderRadius.circular(6),
                     color: const Color(0xFFE8DDB0),
                   ),
-                  child: ListWheelScrollView(
-                    controller: _controller,
-                    itemExtent: 50,
-                    onSelectedItemChanged: (index) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                      widget.onChanged(widget.items[index]);
-                    },
-                    children: List.generate(widget.items.length, (idx) {
-                      final item = widget.items[idx];
-                      final isSelected = idx == _currentIndex;
-                      return Center(
-                        child: Text(
-                          widget.itemBuilder(item),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF2D5016)
-                                .withOpacity(isSelected ? 1.0 : 0.45),
-                          ),
+                  child: Stack(
+                    children: [
+                      ListWheelScrollView(
+                        controller: _controller,
+                        itemExtent: 50,
+                        onSelectedItemChanged: (index) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                          widget.onChanged(widget.items[index]);
+                        },
+                        children: List.generate(widget.items.length, (idx) {
+                          final item = widget.items[idx];
+                          final isSelected = idx == _currentIndex;
+                          return Center(
+                            child: Text(
+                              widget.itemBuilder(item),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF2D5016)
+                                    .withOpacity(isSelected ? 1.0 : 0.45),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      // 中心项点击区：点击选中项来关闭滚轮
+                      Positioned(
+                        top: (wheelHeight - 50) / 2,
+                        left: 0,
+                        right: 0,
+                        height: 50,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isExpanded = false;
+                            });
+                          },
+                          behavior: HitTestBehavior.translucent,
                         ),
-                      );
-                    }),
+                      ),
+                    ],
                   ),
                 ),
               ),
