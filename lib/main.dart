@@ -4,6 +4,67 @@ import 'local_auth_service.dart';
 import 'local_fridge_data_service.dart';
 import 'local_login_page.dart';
 
+// 滚轮选择器Widget
+class PickerColumn<T> extends StatefulWidget {
+  final List<T> items;
+  final T initialValue;
+  final ValueChanged<T> onChanged;
+  final String Function(T) itemBuilder;
+
+  const PickerColumn({
+    Key? key,
+    required this.items,
+    required this.initialValue,
+    required this.onChanged,
+    required this.itemBuilder,
+  }) : super(key: key);
+
+  @override
+  State<PickerColumn<T>> createState() => _PickerColumnState<T>();
+}
+
+class _PickerColumnState<T> extends State<PickerColumn<T>> {
+  late FixedExtentScrollController _controller;
+  late int _initialIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialIndex = widget.items.indexOf(widget.initialValue);
+    if (_initialIndex < 0) _initialIndex = 0;
+    _controller = FixedExtentScrollController(initialItem: _initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 150,
+      child: ListWheelScrollView(
+        controller: _controller,
+        itemExtent: 40,
+        onSelectedItemChanged: (index) {
+          widget.onChanged(widget.items[index]);
+        },
+        children: widget.items
+            .map((item) => Center(
+                  child: Text(
+                    widget.itemBuilder(item),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ))
+            .toList(),
+      ),
+    );
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -336,6 +397,32 @@ class _FridgeHomeState extends State<FridgeHome> {
     return unitLabels[unit] ?? unit;
   }
 
+  String _getUnitLabel(String unit) {
+    return _getShelfLifeUnitLabel(unit);
+  }
+
+  String _getUnitFromLabel(String label) {
+    const labelToUnit = {
+      '日': 'day',
+      '月': 'month',
+      '年': 'year',
+    };
+    return labelToUnit[label] ?? 'day';
+  }
+
+  List<int> _getNumberRangeForUnit(String unit) {
+    switch (unit) {
+      case 'day':
+        return List.generate(30, (i) => i + 1); // 1-30
+      case 'month':
+        return List.generate(24, (i) => i + 1); // 1-24
+      case 'year':
+        return List.generate(10, (i) => i + 1); // 1-10
+      default:
+        return List.generate(30, (i) => i + 1);
+    }
+  }
+
   Widget _buildFoodCard(FridgeItem? item) {
     if (item == null) {
       // 空格子
@@ -600,80 +687,49 @@ class _FridgeHomeState extends State<FridgeHome> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // 保质期选择
-                  Row(
+                  // 保质期选择 - 密码锁风格滚轮
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('保质期: '),
-                      Expanded(
-                        child: Slider(
-                          value: _shelfLifeValue.toDouble(),
-                          min: 1,
-                          max: 365,
-                          divisions: 364,
-                          label: _shelfLifeValue.toString(),
-                          onChanged: (value) {
-                            setState(() {
-                              _shelfLifeValue = value.toInt();
-                            });
-                          },
-                        ),
-                      ),
-                      SizedBox(
-                        width: 70,
-                        child: Text(
-                          '$_shelfLifeValue${_getShelfLifeUnitLabel(_shelfLifeUnit)}',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          backgroundColor: _shelfLifeUnit == 'day'
-                              ? const Color(0xFF2D5016)
-                              : const Color(0xCC8B4513),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _shelfLifeUnit = 'day';
-                          });
-                        },
-                        child: const Text('天'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          backgroundColor: _shelfLifeUnit == 'month'
-                              ? const Color(0xFF2D5016)
-                              : const Color(0xCC8B4513),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _shelfLifeUnit = 'month';
-                          });
-                        },
-                        child: const Text('月'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          backgroundColor: _shelfLifeUnit == 'year'
-                              ? const Color(0xFF2D5016)
-                              : const Color(0xCC8B4513),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _shelfLifeUnit = 'year';
-                          });
-                        },
-                        child: const Text('年'),
+                      const Text('距离过期还有:'),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // 数字列
+                          Expanded(
+                            child: PickerColumn<int>(
+                              items: _getNumberRangeForUnit(_shelfLifeUnit),
+                              initialValue: _shelfLifeValue,
+                              onChanged: (value) {
+                                setState(() {
+                                  _shelfLifeValue = value;
+                                });
+                              },
+                              itemBuilder: (value) => value.toString(),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          // 单位列
+                          Expanded(
+                            child: PickerColumn<String>(
+                              items: const ['日', '月', '年'],
+                              initialValue: _getUnitLabel(_shelfLifeUnit),
+                              onChanged: (value) {
+                                setState(() {
+                                  _shelfLifeUnit = _getUnitFromLabel(value);
+                                  // 根据新单位调整数字范围
+                                  final range =
+                                      _getNumberRangeForUnit(_shelfLifeUnit);
+                                  if (!range.contains(_shelfLifeValue)) {
+                                    _shelfLifeValue = range.first;
+                                  }
+                                });
+                              },
+                              itemBuilder: (value) => value,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
